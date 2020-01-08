@@ -125,4 +125,4 @@ REST_FRAMEWORK = {
 }
 
 # Custom backend to login with email and not username
-AUTHENTICATION_BACKENDS = ['authentication.backends.EmailBackend']
+# AUTHENTICATION_BACKENDS = ['authentication.backends.EmailBackend']

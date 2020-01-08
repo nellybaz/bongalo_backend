@@ -4,6 +4,9 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, L
 from .serializers import UserSerializer, ProfileSerializer
 from authentication.models import UserProfile
 from django.contrib.auth.models import User
+from authentication.permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,6 +20,8 @@ class RegisterAPIView(ListCreateAPIView):
 class UpdateAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    authentication_classes = [BasicAuthentication]
     lookup_field = "username"
 
     def destroy(self, request, *args, **kwargs):

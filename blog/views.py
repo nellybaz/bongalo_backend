@@ -3,6 +3,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from blog.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from blog.models import Post as BlogPost
 from blog.serializers import PostSerializers
 from rest_framework.views import APIView
@@ -37,6 +38,7 @@ class PostsList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = BlogPost.objects.all()
     serializer_class = PostSerializers
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['title', 'body']
 

@@ -30,10 +30,12 @@ class UpdateAPIView(RetrieveUpdateDestroyAPIView):
             user_profile = UserProfile.objects.get(user=instance)
             self.perform_destroy(user_profile)
             self.perform_destroy(instance)
-            return Response({"responseCode": status.HTTP_200_OK, "successMessage": "success"})
+            return Response(data={"successMessage": "success"}, status=status.HTTP_200_OK)
         except Http404:
             pass
-        return Response({"responseCode": status.HTTP_204_NO_CONTENT, "errorMessage": "no content"})
+        return Response(data={"responseCode": status.HTTP_204_NO_CONTENT, "errorMessage": "no content"},
+                        status=status.HTTP_204_NO_CONTENT)
+
 
 
 class ProfileAPIView(ListAPIView):

@@ -99,7 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Kigali'
 
 USE_I18N = True
 
@@ -126,3 +126,6 @@ REST_FRAMEWORK = {
 
 # Custom backend to login with email and not username
 # AUTHENTICATION_BACKENDS = ['authentication.backends.EmailBackend']
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)

@@ -13,7 +13,7 @@ class Apartment(models.Model):
     type = models.CharField(max_length=200, blank=False)
     location = models.CharField(max_length=225, blank=False)
     price = models.CharField(max_length=225, blank=False)
-    discount = models.CharField(max_length=225, blank=False)
+    discount = models.FloatField(max_length=225, blank=False)
     amenities = models.CharField(max_length=225, blank=False)  # String separated by +
     rules = models.CharField(max_length=225, blank=False)  # String separated by +
     check_in = models.DateTimeField(blank=False)  # Timezone is Africa/Kigali

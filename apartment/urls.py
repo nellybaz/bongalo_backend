@@ -1,10 +1,14 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from authentication import views
+from apartment import views
 
 
 urlpatterns = [
-    path('all', views.RegisterAPIView.as_view(), name="all_apartments"),
+    path('add', views.ApartmentCreateAPIView.as_view(), name="add_apartment"),
+    path('update/<str:uid>', views.ApartmentUpdateDeleteAPIView.as_view(), name="update_apartment"),
+    path('delete/<str:uid>', views.ApartmentUpdateDeleteAPIView.as_view(), name="delete_apartment"),
+    path('all', views.ApartmentListAPIView.as_view(), name="all_apartments"),
+    path('search', views.ApartmentSearchAPIView.as_view(), name="search_apartments"),
 
 ]
 

@@ -58,4 +58,3 @@ class UserSerializer(serializers.ModelSerializer):
 
         user_profile.save()
         return user
-

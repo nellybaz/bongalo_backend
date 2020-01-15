@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="793789ca-cec0-4e45-b7a7-26dcdc0355c1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/blog/tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bongalo_backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bongalo_backend/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bongalo_backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/bongalo_backend/urls.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

@@ -11,12 +11,12 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.api_client = APIClient()
-        User.objects.create_user(
+        self.user = User.objects.create_user(
             username="bass106@gmail.comz14xx",
             email="bass106@gmail.comz14xx",
             password="pass"
         )
-        self.user = User.objects.get(username="bass106@gmail.comz14xx")
+        # self.user = User.objects.get(username="bass106@gmail.comz14xx")
 
     def test_register_user_view_success(self):
 
@@ -48,7 +48,7 @@ class TestViews(TestCase):
         # api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.api_client.force_authenticate(user=self.user)
         print(self.user.email, self.user.password)
-        request = self.api_client.get("login/%s" % self.user.username)
+        request = self.api_client.get(reverse("login_user", args=[self.user.username]))
 
         self.assertEquals(request.status_code, 200, "True if login success else False")
 

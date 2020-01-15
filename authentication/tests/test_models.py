@@ -3,6 +3,6 @@ from authentication.models import User, UserProfile
 
 
 class TestModels(TestCase):
-    def setup(self):
+    def setUp(self):
         pass
 

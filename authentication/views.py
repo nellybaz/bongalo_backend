@@ -83,7 +83,7 @@ class LoginAPIView(RetrieveAPIView):
         try:
             response = super().retrieve(request, *args, **kwargs)
             user = User.objects.get(username=response.data['username'])
-            token = Token.objects.get(user=user)  # Create token for the new user and send with response
+            token = Token.objects.get(user=user)  # Get token of the user and send with response
             response.data["token"] = token.key
             response.data['responseCode'] = 1
             return response

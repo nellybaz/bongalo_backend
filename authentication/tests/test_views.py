@@ -48,7 +48,7 @@ class TestViews(TestCase):
         # api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         self.api_client.force_authenticate(user=self.user)
         print(self.user.email, self.user.password)
-        request = self.api_client.get(reverse("login_user", args=["bass106@gmail.comz14xx"]))
+        request = self.api_client.get("login/%s" % self.user.username)
 
         self.assertEquals(request.status_code, 200, "True if login success else False")
 

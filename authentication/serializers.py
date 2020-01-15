@@ -49,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = instance
         user.username = validated_data['username']
         user.email = validated_data['email']
-        user.set_password(validated_data['password'])
+        # user.set_password(validated_data['password'])
 
         user_profile = UserProfile.objects.get(user=user)
         user_profile.first_name = validated_data['first_name']

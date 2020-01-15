@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'blog',
+    'django_seed',
     'rest_framework.authtoken',
     'django.contrib.admin',
     'django.contrib.auth',

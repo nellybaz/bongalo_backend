@@ -8,6 +8,15 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+# TODO: Login username get parameter must match authentication username
+# TODO: Apartment creation owner parameter must match the authenticated user
+# TODO:
+# TODO:
+# TODO:
+# TODO:
+# TODO:
+
+
 class ApartmentUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOnly]
     authentication_classes = [TokenAuthentication]

@@ -1,6 +1,6 @@
-from apartment.serializers import ApartmentSerializer
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
-from apartment.models import Apartment
+from apartment.serializers import ApartmentSerializer, ReviewSerializer
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from apartment.models import Apartment, Review
 from rest_framework.permissions import IsAuthenticated
 from apartment.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from rest_framework.authentication import TokenAuthentication
@@ -15,7 +15,6 @@ from rest_framework import status
 # TODO:
 # TODO:
 # TODO:
-
 
 class ApartmentUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOnly]
@@ -64,3 +63,7 @@ class ApartmentSearchAPIView(ListAPIView):
         else:
             return Apartment.objects.filter(location=location)
 
+
+class ReviewListUpdateCreate(ListAPIView, RetrieveUpdateDestroyAPIView):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()

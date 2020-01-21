@@ -1,4 +1,4 @@
-from apartment.models import Apartment
+from apartment.models import Apartment, Review
 from rest_framework import serializers
 
 
@@ -10,3 +10,7 @@ class ApartmentSerializer(serializers.ModelSerializer):
         fields = ["uid", "title", "owner", "description", "available_rooms", "location", "price", "discount", "type",
                   "amenities", "rules", "check_in", "check_out"]
 
+
+class ReviewSerializer(serializers.ModelSerializer):
+    model = Review
+    field = ["apartment", "review"]

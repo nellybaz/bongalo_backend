@@ -9,6 +9,8 @@ urlpatterns = [
     path('delete/<str:uid>', views.ApartmentUpdateDeleteAPIView.as_view(), name="delete_apartment"),
     path('all', views.ApartmentListAPIView.as_view(), name="all_apartments"),
     path('search', views.ApartmentSearchAPIView.as_view(), name="search_apartments"),
+    path('review/create', views.ReviewListUpdateCreate.as_view(), name="search_apartments"),
+    path('review/delete', views.ReviewListUpdateCreate.as_view(), name="search_apartments"),
 
 ]
 

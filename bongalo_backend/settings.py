@@ -136,6 +136,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
+    # 'EXCEPTION_HANDLER': 'bongalo_backend.authentication.utils.custom_exception_handler.'
 }
 
 # Custom backend to login with email and not username

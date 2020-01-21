@@ -14,6 +14,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 
 
+# TODO: Set up custom responses
 # Register Users and create profiles at [/api/auth/register/], POST
 class RegisterAPIView(CreateAPIView):
     serializer_class = UserSerializer

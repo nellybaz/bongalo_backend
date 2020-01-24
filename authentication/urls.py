@@ -4,9 +4,11 @@ from authentication import views
 
 
 urlpatterns = [
-    path('register', views.RegisterAPIView.as_view(), name="register_user"),
-    path('login/<str:username>', views.LoginAPIView.as_view(), name="login_user"),
-    path('update/<str:username>', views.UpdateAPIView.as_view(), name="update_user"),
+    path('register', views.UserRegisterViews.as_view(), name="register_user"),
+    # path('login/<str:username>', views.LoginAPIView.as_view(), name="login_user"),
+    path('update', views.UserUpdateView.as_view(), name="update_user"),
+
+
 
 
 ]

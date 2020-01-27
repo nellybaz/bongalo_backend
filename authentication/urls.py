@@ -5,8 +5,9 @@ from authentication import views
 
 urlpatterns = [
     path('register', views.UserRegisterViews.as_view(), name="register_user"),
-    # path('login/<str:username>', views.LoginAPIView.as_view(), name="login_user"),
+    path('login', views.LoginView.as_view(), name="login_user"),
     path('update', views.UserUpdateView.as_view(), name="update_user"),
+    path('delete', views.DeleteView.as_view(), name="delete_user"),
 
 
 

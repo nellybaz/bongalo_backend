@@ -133,6 +133,7 @@ class UserSerializer(serializers.Serializer):
             **user_data
         )
         user.set_password(validated_data.pop("password"))
+        user.save()
 
         #  Create token for user
         token = Token.objects.create(

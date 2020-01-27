@@ -139,8 +139,6 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'bongalo_backend.authentication.utils.custom_exception_handler.'
 }
 
-# Custom backend to login with email and not username
-# AUTHENTICATION_BACKENDS = ['authentication.backends.EmailBackend']
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )

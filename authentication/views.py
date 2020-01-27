@@ -16,8 +16,6 @@ from django.contrib.auth import authenticate
 
 
 class LoginView(APIView):
-    # authentication_classes = [BasicAuthentication]
-
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
@@ -26,10 +24,16 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         print(user)
         if user:
-            # Get token
-            token = Token.objects.get(user=user)
-            response_data = {'responseCode': 1, 'data': "login successful", "token": token.key}
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            # check if user is active
+            profile = UserProfile.objects.get(user=user)
+            if profile.is_active:
+                # Get token
+                token = Token.objects.get(user=user)
+                response_data = {'responseCode': 1, 'data': "login successful", "token": token.key}
+                return Response(data=response_data, status=status.HTTP_200_OK)
+            else:
+                response_data = {'responseCode': 0, 'data': "user does not exists anymore"}
+                return Response(data=response_data, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         response_data = {'responseCode': 0, 'data': "login failed"}
         return Response(data=response_data, status=status.HTTP_503_SERVICE_UNAVAILABLE)

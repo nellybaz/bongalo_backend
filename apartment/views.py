@@ -1,5 +1,6 @@
 from apartment.serializers import ApartmentSerializer, ReviewSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.views import APIView
 from apartment.models import Apartment, Review
 from rest_framework.permissions import IsAuthenticated
 from apartment.permissions import IsOwnerOrReadOnly as IsOwnerOnly
@@ -23,21 +24,29 @@ class ApartmentUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Apartment.objects.all()
     lookup_field = "uid"
 
-    # def delete(self, request, *args, **kwargs):
-    #     try:
-    #         response = super().delete(request, *args, **kwargs)
-    #         response.data['responseCode'] = 1
-    #         return response
-    #     except:
-    #         return Response(data={"responseCode": 0, "errorMessage": "Delete operation failed"},
-    #                         status=status.HTTP_400_BAD_REQUEST)
 
-
-class ApartmentCreateAPIView(CreateAPIView):
+class ApartmentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOnly]
     authentication_classes = [TokenAuthentication]
-    serializer_class = ApartmentSerializer
-    queryset = Apartment.objects.all()
+    # serializer_class = ApartmentSerializer
+    # queryset = Apartment.objects.all()
+
+    def post(self, request):
+        serialized = ApartmentSerializer(data=request.data, context={"request": "post"})
+        if serialized.is_valid():
+            serialized.save()
+            response_data = {
+                "statusCode": 1,
+                "data": serialized.data,
+            }
+            return Response(data=response_data, status=status.HTTP_201_CREATED)
+
+        response_data = {
+            "statusCode": 0,
+            "data": serialized.errors
+        }
+
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ApartmentListAPIView(ListAPIView):

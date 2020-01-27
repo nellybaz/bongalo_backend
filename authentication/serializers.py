@@ -17,8 +17,9 @@ class ReturnedUser:
     is_host = ""
     is_admin = ""
     token = ""
+    uuid = ""
 
-    def __init__(self, username,  first_name, last_name, email, address, resident_country, origin_country, phone, is_host, is_admin, token):
+    def __init__(self, username,  first_name, last_name, email, address, resident_country, origin_country, phone, is_host, is_admin, token, uuid):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
@@ -30,6 +31,7 @@ class ReturnedUser:
         self.is_host = is_host
         self.is_admin = is_admin
         self.token = token
+        self.uuid = uuid
 
 
 class UserSerializer(serializers.Serializer):
@@ -43,6 +45,7 @@ class UserSerializer(serializers.Serializer):
     origin_country = serializers.CharField()
     phone = serializers.CharField()
     token = serializers.CharField(read_only=True)
+    uuid = serializers.CharField(read_only=True)
 
     # These information will be handled by a different serializer to verify documents
 
@@ -140,12 +143,12 @@ class UserSerializer(serializers.Serializer):
             user=user
         )
 
-        UserProfile.objects.create(
+        profile = UserProfile.objects.create(
             user=user,
             **profile_data
         )
 
-        # user_to_return = CustomUser("hello", "hi")
+        profile_data["uuid"] = profile.uuid
 
         returned_user = ReturnedUser(** user_data, **profile_data, token=token.key)
 

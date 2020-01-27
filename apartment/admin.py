@@ -8,8 +8,8 @@ class ImagesAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('uid', 'category')
-    fields = ('uid', 'category')
+    list_display = ('uuid', 'category')
+    fields = ('uuid', 'category')
 
 
 class ApartmentAdmin(admin.ModelAdmin):

@@ -5,12 +5,13 @@ from apartment import views
 
 urlpatterns = [
     path('add', views.ApartmentCreateAPIView.as_view(), name="add_apartment"),
-    path('update/<str:uid>', views.ApartmentUpdateDeleteAPIView.as_view(), name="update_apartment"),
-    path('delete/<str:uid>', views.ApartmentUpdateDeleteAPIView.as_view(), name="delete_apartment"),
+    path('update', views.ApartmentUpdateDeleteAPIView.as_view(), name="update_apartment"),
+    path('delete', views.ApartmentUpdateDeleteAPIView.as_view(), name="delete_apartment"),
     path('all', views.ApartmentListAPIView.as_view(), name="all_apartments"),
     path('search', views.ApartmentSearchAPIView.as_view(), name="search_apartments"),
-    path('review/create', views.ReviewListUpdateCreate.as_view(), name="search_apartments"),
-    path('review/delete', views.ReviewListUpdateCreate.as_view(), name="search_apartments"),
+    path('review/add', views.ReviewListUpdateCreate.as_view(), name="add_apartment_review"),
+    path('review/delete', views.ReviewListUpdateCreate.as_view(), name="delete_apartment_review"),
+    path('review', views.ReviewListUpdateCreate.as_view(), name="get_apartment_review"),
 
 ]
 

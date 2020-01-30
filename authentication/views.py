@@ -29,7 +29,7 @@ class LoginView(APIView):
             if profile.is_active:
                 # Get token
                 token = Token.objects.get(user=user)
-                response_data = {'responseCode': 1, 'data': "login successful", "token": token.key}
+                response_data = {'responseCode': 1, 'data': "login successful", "uuid": profile.uuid, "token": token.key}
                 return Response(data=response_data, status=status.HTTP_200_OK)
             else:
                 response_data = {'responseCode': 0, 'data': "user does not exists anymore"}

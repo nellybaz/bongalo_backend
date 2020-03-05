@@ -8,6 +8,8 @@ urlpatterns = [
     path('login', views.LoginView.as_view(), name="login_user"),
     path('update', views.UserUpdateView.as_view(), name="update_user"),
     path('delete', views.DeleteView.as_view(), name="delete_user"),
+    path('social/auth', views.SocialAuth.as_view(), name="social_auth"),
+    path('user/verify', views.VerifyUserView.as_view(), name="verify_user"),
 
 
 

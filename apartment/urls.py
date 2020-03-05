@@ -12,6 +12,10 @@ urlpatterns = [
     path('review/add', views.ReviewListUpdateCreate.as_view(), name="add_apartment_review"),
     path('review/delete', views.ReviewListUpdateCreate.as_view(), name="delete_apartment_review"),
     path('review', views.ReviewListUpdateCreate.as_view(), name="get_apartment_review"),
+    path('images/add', views.ImageView.as_view(), name="add_apartment_image"),
+    path('images/get', views.ImageView.as_view(), name="get_apartment_image"),
+    path('book', views.BookingView.as_view(), name="book_apartment"),
+    path('rate', views.RatingView.as_view(), name="rate_apartment"),
 
 ]
 

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 
 
@@ -10,67 +9,36 @@ class ReturnedUser:
     first_name = ""
     last_name = ""
     email = ""
-    address = ""
-    resident_country = ""
-    origin_country = ""
-    phone = ""
-    is_host = ""
     is_admin = ""
     token = ""
     uuid = ""
+    is_active = ""
 
-    def __init__(self, username,  first_name, last_name, email, address, resident_country, origin_country, phone, is_host, is_admin, token, uuid):
+    def __init__(self, username, first_name, last_name, email, is_admin, is_active, token, uuid):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.address = address
-        self.resident_country = resident_country
-        self.origin_country = origin_country
-        self.phone = phone
-        self.is_host = is_host
         self.is_admin = is_admin
         self.token = token
         self.uuid = uuid
+        self.is_active = is_active
 
 
-class UserSerializer(serializers.Serializer):
-    username = serializers.CharField()
+class UserRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField(write_only=True)
-    address = serializers.CharField()
-    resident_country = serializers.CharField()
-    origin_country = serializers.CharField()
-    phone = serializers.CharField()
     token = serializers.CharField(read_only=True)
     uuid = serializers.CharField(read_only=True)
-
-    # These information will be handled by a different serializer to verify documents
-
-    # national_id = serializers.FileField()
-    # passport = serializers.FileField()
-    is_host = serializers.BooleanField()
     is_admin = serializers.BooleanField()
+    is_active = serializers.BooleanField()
 
-    #  Validate username for duplicates etc
-    def validate_username(self, value):
-        request_method = self.context["request"]
-        if request_method == "put":
-            is_exits = User.objects.filter(username=value)
-            if is_exits.exists():
-                return value
-            else:
-                raise serializers.ValidationError("username does not exits")
-
-        elif request_method == "post":
-            is_exits = User.objects.filter(username=value)
-            if is_exits.exists():
-                raise serializers.ValidationError("username already exits")
-            return value
-        else:
-            return value
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists() and self.context['request'] == "post":
+            raise serializers.ValidationError("email address already used")
+        return value
 
     def update(self, instance, validated_data):
         # Separate data for users model
@@ -89,6 +57,7 @@ class UserSerializer(serializers.Serializer):
             "phone": validated_data.pop("phone"),
             "is_host": validated_data.pop("is_host"),
             "is_admin": validated_data.pop("is_admin"),
+            "is_active": validated_data.pop("is_active"),
         }
 
         instance.username = user_data['username']
@@ -109,6 +78,8 @@ class UserSerializer(serializers.Serializer):
 
         profile.save()
         token = Token.objects.get(user=instance)
+
+        profile_data["uuid"] = profile.uuid
         returned_user = ReturnedUser(**user_data, **profile_data, token=token.key)
 
         return returned_user
@@ -116,7 +87,7 @@ class UserSerializer(serializers.Serializer):
     def create(self, validated_data):
         # Separate data for users model
         user_data = {
-            "username": validated_data.pop('username'),
+            "username": validated_data['email'],
             "email": validated_data.pop("email"),
             "first_name": validated_data.pop("first_name"),
             "last_name": validated_data.pop("last_name"),
@@ -124,12 +95,8 @@ class UserSerializer(serializers.Serializer):
 
         # Separate data for profile model
         profile_data = {
-            "address": validated_data.pop("address"),
-            "resident_country": validated_data.pop("resident_country"),
-            "origin_country": validated_data.pop("origin_country"),
-            "phone": validated_data.pop("phone"),
-            "is_host": validated_data.pop("is_host"),
             "is_admin": validated_data.pop("is_admin"),
+            "is_active": validated_data.pop("is_active"),
         }
 
         user = User.objects.create_user(
@@ -150,10 +117,22 @@ class UserSerializer(serializers.Serializer):
 
         profile_data["uuid"] = profile.uuid
 
-        returned_user = ReturnedUser(** user_data, **profile_data, token=token.key)
+        returned_user = ReturnedUser(**user_data, **profile_data, token=token.key)
 
         return returned_user
 
 
+class VerifyUserSerializer(serializers.Serializer):
+    national_id = serializers.CharField(allow_blank=True)
+    passport = serializers.CharField()
 
+    def update(self, instance, validated_data):
+        instance.national_id = validated_data['national_id']
+        instance.passport = validated_data['passport']
 
+        instance.save()
+
+        return instance
+
+    def create(self, validated_data):
+        pass

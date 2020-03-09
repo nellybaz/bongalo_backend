@@ -155,5 +155,19 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8080",
     "http://localhost:8080"
 ]
+DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 
 django_heroku.settings(locals())
+
+
+# send grid
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'nellybaz'
+EMAIL_HOST_PASSWORD = "XFerGzwPmnL+/d4"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'info@bongalo.co'
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "Email sent from Bongalo"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

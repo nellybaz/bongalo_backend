@@ -8,9 +8,11 @@ class UserProfile(models.Model):
     uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=225, blank=True, )
+    description = models.CharField(max_length=225, default="")
     resident_country = models.CharField(max_length=225, blank=True, )
     origin_country = models.CharField(max_length=225, blank=True, )
     phone = models.CharField(max_length=225, blank=True, )
+    profile_image = models.CharField(max_length=225, default="", blank=True)
     national_id = models.CharField(blank=True, max_length=225)
     is_verified = models.BooleanField(default=False, blank=True)
     passport = models.CharField(blank=True, max_length=225)
@@ -19,5 +21,18 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name
 
 
+class PaymentMethod(models.Model):
+    uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    momo_number = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class PinVerify(models.Model):
+    uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    pin = models.CharField(max_length=10)

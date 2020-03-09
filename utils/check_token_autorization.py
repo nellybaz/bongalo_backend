@@ -8,7 +8,7 @@ def check_token_authorization(user, request):
         request_token = request.META.get('HTTP_AUTHORIZATION').split(" ")
         token = Token.objects.get(key=request_token[1])
         print(token.key)
-        if token.user != user:
+        if token.user != user.user:
             return False
 
     return True

@@ -8,18 +8,15 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
+import datetime as dt
+from authentication.models import UserProfile
 
 
-# TODO: Apartment creation owner parameter must match the authenticated user
 # TODO: Implement number of views for an apartment
-# TODO: Password Validation on the backend
 # TODO: Ask traveller phone submission when making reservations
-# TODO: Available from/to dates, check-in/to times
-# TODO: Searching with location and available dates, filtering with check-in/out times
 # TODO: Apartment ratings
-# TODO: Host [apartment listing *** priority]
-# TODO:
-# TODO:
+# TODO: Guest can see open bookings and can cancel
+# TODO: Create events and experience model
 # TODO:
 # TODO:
 # TODO:
@@ -116,26 +113,85 @@ class ApartmentCreateAPIView(APIView):
 
 class ApartmentListAPIView(ListAPIView):
     serializer_class = ApartmentSerializer
-    queryset = Apartment.objects.all()
+    queryset = Apartment.objects.filter(is_active=True, is_available=True)
 
 
 # Receives location, check_in, check_out and returns filtered query
-class ApartmentSearchAPIView(ListAPIView):
-    serializer_class = ApartmentSerializer
+class ApartmentSearchAPIView(APIView):
 
-    def get_queryset(self):
-        country = self.request.query_params.get("country")  # Is mandatory field for search
-        available_from = self.request.query_params.get("available-from")
-        available_to = self.request.query_params.get("available-to")
+    def get(self, request):
+        apartment_type = self.request.query_params.get("type")
+        check_in = self.request.query_params.get("checkin")
+        check_out = self.request.query_params.get("checkout")
+        number_of_guest = self.request.query_params.get("guest")
+        result = []
 
-        if available_from and available_to:
-            return Apartment.objects.filter(country=country, available_from__gte=available_from, available_to__lte=available_to)
-        elif available_from and not available_to:
-            return Apartment.objects.filter(country=country, available_from__gte=available_from)
-        elif available_to and not available_from:
-            return Apartment.objects.filter(country=country, available_to__lte=available_to)
-        else:
-            return Apartment.objects.filter(country=country)
+        # No checkout, no checkin and apartment type is all
+        if not check_out and not check_in and apartment_type == "all":
+            result = Apartment.objects.filter(is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            serialized = ApartmentSerializer(result, many=True)
+            response = {
+                'responseCode': 1,
+                'count': len(serialized.data),
+                'results': serialized.data
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        # No checkout, no checkin and apartment type is not all
+        if not check_out and not check_in and apartment_type != "all":
+            result = Apartment.objects.filter(space=apartment_type, is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            serialized = ApartmentSerializer(result, many=True)
+            response = {
+                 'responseCode': 1,
+                 'count': len(serialized.data),
+                 'results': serialized.data
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        if check_in and check_out and apartment_type == "all":
+            res = []
+            all_apartment = Apartment.objects.filter(is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            for apartment in all_apartment:
+                d_apartment = apartment
+                check_out_d = dt.datetime.strptime(check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                check_in_d = dt.datetime.strptime(check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date() > d_apartment.unavailable_to:
+                    res.append(d_apartment.uuid)
+
+            result = Apartment.objects.filter(uuid__in=res)
+            serialized = ApartmentSerializer(result, many=True)
+            response = {
+                'responseCode': 1,
+                'count': len(serialized.data),
+                'results': serialized.data
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        if check_in and check_out and apartment_type != "all":
+            res = []
+            all_apartment = Apartment.objects.filter(space=apartment_type, is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            for apartment in all_apartment:
+                d_apartment = apartment
+                check_out_d = dt.datetime.strptime(check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                check_in_d = dt.datetime.strptime(check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date() > d_apartment.unavailable_to:
+                    res.append(d_apartment.uuid)
+
+            result = Apartment.objects.filter(uuid__in=res)
+            serialized = ApartmentSerializer(result, many=True)
+            response = {
+                 'responseCode': 1,
+                 'count': len(serialized.data),
+                 'results': serialized.data
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            'responseCode': 1,
+            'count': 0,
+            'results': []
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
 
 
 class ReviewListUpdateCreate(APIView):
@@ -290,3 +346,79 @@ class RatingView(APIView):
             response = {
 
             }
+
+
+class ListingView(APIView):
+    def get(self, request):
+        user_id = self.request.query_params.get('user')
+        if UserProfile.objects.filter(uuid=user_id).exists():
+            user = UserProfile.objects.get(uuid=user_id)
+            serialized = ApartmentSerializer(Apartment.objects.filter(owner=user, is_active=True), many=True)
+            if serialized:
+                response = {
+                    "responseCode": 1,
+                    "count": len(serialized.data),
+                    "data": serialized.data
+                }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            "responseCode": 0,
+            "data": "user does not exists"
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        user_id = self.request.query_params.get('user')
+        apartment_id = self.request.query_params.get('apartment')
+        if UserProfile.objects.filter(uuid=user_id).exists():
+            user = UserProfile.objects.get(uuid=user_id)
+            apartment = Apartment.objects.get(uuid=apartment_id)
+
+            if apartment.owner == user:
+                apartment.is_active = False
+                apartment.save()
+                response = {
+                    "responseCode": 1,
+                    "data": "apartment deleted"
+                }
+                return Response(data=response, status=status.HTTP_200_OK)
+
+            response = {
+                "responseCode": 0,
+                "data": "apartment is not owned by this user"
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            "responseCode": 0,
+            "data": "user does not exists"
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
+
+    def update(self, request):
+        user_id = request.data['user']
+        apartment_id = request.data['apartment']
+        if UserProfile.objects.filter(uuid=user_id).exits():
+            user = UserProfile.objects.get(uuid=user_id)
+            apartment = Apartment.objects.get(uuid=apartment_id)
+            if apartment.owner == user:
+                serialized = ApartmentSerializer(apartment, data=request.data)
+                if serialized:
+                    response = {
+                        "responseCode": 1,
+                        "data": serialized.data
+                    }
+                return Response(data=response, status=status.HTTP_200_OK)
+
+            response = {
+                "responseCode": 0,
+                "data": "apartment is not owned by this user"
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            "responseCode": 0,
+            "data": "user does not exists"
+        }
+        return Response(data=response, status=status.HTTP_200_OK)

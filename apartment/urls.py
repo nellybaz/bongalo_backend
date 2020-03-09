@@ -16,6 +16,9 @@ urlpatterns = [
     path('images/get', views.ImageView.as_view(), name="get_apartment_image"),
     path('book', views.BookingView.as_view(), name="book_apartment"),
     path('rate', views.RatingView.as_view(), name="rate_apartment"),
+    path('show-listing', views.ListingView.as_view(), name="show_listing"),
+    path('delete-listing', views.ListingView.as_view(), name="delete_listing"),
+    path('update-listing', views.ListingView.as_view(), name="update_listing"),
 
 ]
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserProfile
+from .models import UserProfile, PinVerify
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
@@ -13,6 +13,7 @@ class ReturnedUser:
     token = ""
     uuid = ""
     is_active = ""
+    # profile_image = ""
 
     def __init__(self, username, first_name, last_name, email, is_admin, is_active, token, uuid):
         self.username = username
@@ -22,6 +23,7 @@ class ReturnedUser:
         self.is_admin = is_admin
         self.token = token
         self.uuid = uuid
+        # self.profile_image = profile_image
         self.is_active = is_active
 
 
@@ -29,6 +31,7 @@ class UserRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     email = serializers.CharField()
+    # profile_image = serializers.CharField(read_only=True, allow_blank=True)
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(read_only=True)
     uuid = serializers.CharField(read_only=True)
@@ -43,49 +46,49 @@ class UserRegisterSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         # Separate data for users model
         user_data = {
-            "username": validated_data.pop('username'),
-            "email": validated_data.pop("email"),
+            # "username": validated_data.pop('username'),
+            # "email": validated_data.pop("email"),
             "first_name": validated_data.pop("first_name"),
             "last_name": validated_data.pop("last_name"),
         }
 
         # Separate data for profile model
         profile_data = {
-            "address": validated_data.pop("address"),
-            "resident_country": validated_data.pop("resident_country"),
-            "origin_country": validated_data.pop("origin_country"),
+            # "address": validated_data.pop("address"),
+            # "resident_country": validated_data.pop("resident_country"),
+            # "origin_country": validated_data.pop("origin_country"),
             "phone": validated_data.pop("phone"),
-            "is_host": validated_data.pop("is_host"),
-            "is_admin": validated_data.pop("is_admin"),
-            "is_active": validated_data.pop("is_active"),
+            # "is_host": validated_data.pop("is_host"),
+            # "is_admin": validated_data.pop("is_admin"),
+            # "is_active": validated_data.pop("is_active"),
         }
 
-        instance.username = user_data['username']
-        instance.email = user_data['email']
-        instance.first_name = user_data['first_name']
-        instance.last_name = user_data['last_name']
-
+        instance.phone = profile_data['phone']
+        # instance.email = user_data['email']
         instance.save()
 
-        profile = UserProfile.objects.get(user=instance)
+        user = instance.user
 
-        profile.address = profile_data['address']
-        profile.resident_country = profile_data['resident_country']
-        profile.origin_country = profile_data['origin_country']
-        profile.phone = profile_data['phone']
-        profile.is_host = profile_data['is_host']
-        profile.is_admin = profile.is_admin
+        # profile.address = profile_data['address']
+        # profile.resident_country = profile_data['resident_country']
+        # profile.origin_country = profile_data['origin_country']
+        # profile.phone = profile_data['phone']
+        # profile.is_host = profile_data['is_host']
+        # profile.is_admin = profile.is_admin
+        user.first_name = user_data['first_name']
+        user.last_name = user_data['last_name']
 
-        profile.save()
-        token = Token.objects.get(user=instance)
+        user.save()
+        token = Token.objects.get(user=user)
 
-        profile_data["uuid"] = profile.uuid
+        profile_data["uuid"] = instance.uuid
         returned_user = ReturnedUser(**user_data, **profile_data, token=token.key)
 
         return returned_user
 
     def create(self, validated_data):
         # Separate data for users model
+        pin_code = self.context['pin_code']
         user_data = {
             "username": validated_data['email'],
             "email": validated_data.pop("email"),
@@ -114,6 +117,8 @@ class UserRegisterSerializer(serializers.Serializer):
             user=user,
             **profile_data
         )
+
+        PinVerify.objects.create(user=profile, pin=pin_code)
 
         profile_data["uuid"] = profile.uuid
 

@@ -2,6 +2,7 @@ from django.db import models
 from uuid import uuid4
 from django.contrib.auth.models import User
 from datetime import datetime
+from authentication.models import UserProfile
 
 
 class Category(models.Model):
@@ -43,7 +44,7 @@ class Apartment(models.Model):
     """
 
     uuid = models.CharField(max_length=225, unique=True, blank=False, default=uuid4, primary_key=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     title = models.CharField(max_length=225, blank=False)
     main_image = models.CharField(max_length=225, blank=False)  # Stores image url which is store on a cloud
     total_rooms = models.IntegerField(default=1, blank=False)
@@ -68,8 +69,8 @@ class Apartment(models.Model):
     unavailable_to = models.DateField(blank=False)
     min_nights = models.IntegerField()
     max_nights = models.IntegerField()
-    check_in = models.TimeField(blank=True)  # Timezone is Africa/Kigali
-    check_out = models.TimeField(blank=True)  # Timezone is Africa/Kigali
+    check_in = models.CharField(max_length=10, blank=True)  # Timezone is Africa/Kigali
+    check_out = models.CharField(max_length=10, blank=True)  # Timezone is Africa/Kigali
     is_available = models.BooleanField(default=True, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -115,18 +116,7 @@ class Review(models.Model):
 class Images(models.Model):
     uuid = models.CharField(default=uuid4, unique=True, max_length=225, primary_key=True)
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE)
-    image = models.ImageField(max_length=225, blank=False)
-    image1 = models.ImageField(max_length=225, blank=False)
-    image2 = models.ImageField(max_length=225, blank=False)
-    image3 = models.ImageField(max_length=225, blank=False)
-    image4 = models.ImageField(max_length=225, blank=False)
-    image5 = models.ImageField(max_length=225, blank=False)
-    image6 = models.ImageField(max_length=225, blank=False)
-    image7 = models.ImageField(max_length=225, blank=False)
-    image8 = models.ImageField(max_length=225, blank=False)
-    image9 = models.ImageField(max_length=225, blank=False)
-    image10 = models.ImageField(max_length=225, blank=False)
-
+    image = models.CharField(max_length=225, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

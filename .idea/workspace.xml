@@ -2,24 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="793789ca-cec0-4e45-b7a7-26dcdc0355c1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0002_auto_20200129_1027.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0003_auto_20200201_1029.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0004_auto_20200201_1032.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0005_auto_20200201_1759.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0006_auto_20200201_1816.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0007_apartment_max_guest_number.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0008_auto_20200201_2357.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0009_auto_20200221_1326.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0010_auto_20200221_1327.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0011_auto_20200221_1329.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0012_auto_20200305_0915.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apartment/migrations/0013_auto_20200305_1751.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication/migrations/0002_auto_20200131_1529.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication/migrations/0003_auto_20200224_0937.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blog/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apartment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apartment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apartment/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/apartment/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apartment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apartment/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apartment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apartment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bongalo_backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bongalo_backend/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/check_token_autorization.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/check_token_autorization.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

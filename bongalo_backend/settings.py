@@ -154,7 +154,7 @@ AUTHENTICATION_BACKENDS = (
 CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8080",
     "http://localhost:8080",
-    "https://bongalo-frontend.herokuapp.com/"
+    "https://bongalo-frontend.herokuapp.com"
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

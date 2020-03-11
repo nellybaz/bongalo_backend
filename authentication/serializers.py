@@ -88,7 +88,11 @@ class UserRegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Separate data for users model
-        pin_code = self.context['pin_code'] or ""
+        try:
+            pin_code = self.context['pin_code']
+        except:
+            pin_code = "12345"
+
         user_data = {
             "username": validated_data['email'],
             "email": validated_data.pop("email"),

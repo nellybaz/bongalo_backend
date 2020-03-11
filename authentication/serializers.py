@@ -88,7 +88,7 @@ class UserRegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Separate data for users model
-        pin_code = self.context['pin_code']
+        pin_code = self.context['pin_code'] or ""
         user_data = {
             "username": validated_data['email'],
             "email": validated_data.pop("email"),

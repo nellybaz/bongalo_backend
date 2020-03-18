@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='paymentmethod',
             name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='authentication.UserProfile'),
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                to='authentication.UserProfile'),
         ),
     ]

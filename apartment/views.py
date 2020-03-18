@@ -35,7 +35,9 @@ class ApartmentUpdateDeleteAPIView(APIView):
         apartment_exists = Apartment.objects.filter(uuid=apartment_uuid)
         if apartment_exists.exists():
             apartment = Apartment.objects.get(uuid=apartment_uuid)
-            serialized = ApartmentSerializer(apartment, data=request.data, context={"request": "put"}, partial=True)
+            serialized = ApartmentSerializer(
+                apartment, data=request.data, context={
+                    "request": "put"}, partial=True)
             if serialized.is_valid():
                 serialized.save()
                 response_data = {
@@ -94,7 +96,9 @@ class ApartmentCreateAPIView(APIView):
     # queryset = Apartment.objects.all()
 
     def post(self, request):
-        serialized = ApartmentSerializer(data=request.data, context={"request": "post"})
+        serialized = ApartmentSerializer(
+            data=request.data, context={
+                "request": "post"})
         if serialized.is_valid():
             serialized.save()
             response_data = {
@@ -128,7 +132,10 @@ class ApartmentSearchAPIView(APIView):
 
         # No checkout, no checkin and apartment type is all
         if not check_out and not check_in and apartment_type == "all":
-            result = Apartment.objects.filter(is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            result = Apartment.objects.filter(
+                is_available=True,
+                max_guest_number__gte=number_of_guest,
+                is_active=True)
             serialized = ApartmentSerializer(result, many=True)
             response = {
                 'responseCode': 1,
@@ -139,23 +146,31 @@ class ApartmentSearchAPIView(APIView):
 
         # No checkout, no checkin and apartment type is not all
         if not check_out and not check_in and apartment_type != "all":
-            result = Apartment.objects.filter(space=apartment_type, is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            result = Apartment.objects.filter(
+                space=apartment_type,
+                is_available=True,
+                max_guest_number__gte=number_of_guest,
+                is_active=True)
             serialized = ApartmentSerializer(result, many=True)
             response = {
-                 'responseCode': 1,
-                 'count': len(serialized.data),
-                 'results': serialized.data
+                'responseCode': 1,
+                'count': len(serialized.data),
+                'results': serialized.data
             }
             return Response(data=response, status=status.HTTP_200_OK)
 
         if check_in and check_out and apartment_type == "all":
             res = []
-            all_apartment = Apartment.objects.filter(is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            all_apartment = Apartment.objects.filter(
+                is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
             for apartment in all_apartment:
                 d_apartment = apartment
-                check_out_d = dt.datetime.strptime(check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                check_in_d = dt.datetime.strptime(check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date() > d_apartment.unavailable_to:
+                check_out_d = dt.datetime.strptime(
+                    check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                check_in_d = dt.datetime.strptime(
+                    check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date(
+                ) > d_apartment.unavailable_to:
                     res.append(d_apartment.uuid)
 
             result = Apartment.objects.filter(uuid__in=res)
@@ -169,20 +184,27 @@ class ApartmentSearchAPIView(APIView):
 
         if check_in and check_out and apartment_type != "all":
             res = []
-            all_apartment = Apartment.objects.filter(space=apartment_type, is_available=True, max_guest_number__gte=number_of_guest, is_active=True)
+            all_apartment = Apartment.objects.filter(
+                space=apartment_type,
+                is_available=True,
+                max_guest_number__gte=number_of_guest,
+                is_active=True)
             for apartment in all_apartment:
                 d_apartment = apartment
-                check_out_d = dt.datetime.strptime(check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                check_in_d = dt.datetime.strptime(check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date() > d_apartment.unavailable_to:
+                check_out_d = dt.datetime.strptime(
+                    check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                check_in_d = dt.datetime.strptime(
+                    check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
+                if check_out_d.date() < d_apartment.unavailable_from or check_in_d.date(
+                ) > d_apartment.unavailable_to:
                     res.append(d_apartment.uuid)
 
             result = Apartment.objects.filter(uuid__in=res)
             serialized = ApartmentSerializer(result, many=True)
             response = {
-                 'responseCode': 1,
-                 'count': len(serialized.data),
-                 'results': serialized.data
+                'responseCode': 1,
+                'count': len(serialized.data),
+                'results': serialized.data
             }
             return Response(data=response, status=status.HTTP_200_OK)
 
@@ -234,7 +256,9 @@ class ReviewListUpdateCreate(APIView):
         return Response(data=response_data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serialized = ReviewSerializer(data=request.data, context={"request": "post"})
+        serialized = ReviewSerializer(
+            data=request.data, context={
+                "request": "post"})
         if serialized.is_valid():
             serialized.save()
             response_data = {
@@ -255,7 +279,8 @@ class ReviewListUpdateCreate(APIView):
             review = Review.objects.get(uuid=request.data['uuid'])
 
             # Check if person deleting made the review
-            user_exists = User.objects.filter(username=request.data['given_by'])
+            user_exists = User.objects.filter(
+                username=request.data['given_by'])
             if not user_exists.exists():
                 response_data = {
                     "statusCode": 0,
@@ -296,7 +321,9 @@ class ReviewListUpdateCreate(APIView):
 
 class ImageView(APIView):
     def post(self, request):
-        serialized = ImageSerializer(data=request.data, context={"request": "post"})
+        serialized = ImageSerializer(
+            data=request.data, context={
+                "request": "post"})
         if serialized.is_valid():
             serialized.save()
 
@@ -310,11 +337,15 @@ class ImageView(APIView):
         apartment = self.request.query_params.get("apartment")
         if not Apartment.objects.filter(uuid=apartment).exists():
 
-            response_data = {"responseCode": 0, "data": "apartment does not exist"}
+            response_data = {
+                "responseCode": 0,
+                "data": "apartment does not exist"}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
         apartment_obj = Images.objects.filter(apartment=apartment)
-        serialized = ImageSerializer(apartment_obj, context={"request": "post"}, many=True)
+        serialized = ImageSerializer(
+            apartment_obj, context={
+                "request": "post"}, many=True)
         if serialized:
 
             response_data = {"responseCode": 1, "data": serialized.data}
@@ -326,7 +357,9 @@ class ImageView(APIView):
 
 class BookingView(APIView):
     def post(self, request):
-        serialized = BookingSerializer(data=request.data, context={"request": "post"})
+        serialized = BookingSerializer(
+            data=request.data, context={
+                "request": "post"})
         if serialized.is_valid():
             serialized.save()
 
@@ -339,10 +372,12 @@ class BookingView(APIView):
 
 class RatingView(APIView):
     def post(self, request):
-        serialized = RatingSerializer(data=request.data, context={"request": "post"})
+        serialized = RatingSerializer(
+            data=request.data, context={
+                "request": "post"})
         if serialized.is_valid():
             serialized.save()
-            
+
             response = {
 
             }
@@ -353,7 +388,9 @@ class ListingView(APIView):
         user_id = self.request.query_params.get('user')
         if UserProfile.objects.filter(uuid=user_id).exists():
             user = UserProfile.objects.get(uuid=user_id)
-            serialized = ApartmentSerializer(Apartment.objects.filter(owner=user, is_active=True), many=True)
+            serialized = ApartmentSerializer(
+                Apartment.objects.filter(
+                    owner=user, is_active=True), many=True)
             if serialized:
                 response = {
                     "responseCode": 1,

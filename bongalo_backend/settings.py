@@ -1,6 +1,7 @@
 import os
 import django_heroku
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -75,9 +77,9 @@ WSGI_APPLICATION = 'bongalo_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME':  'bongalo',
@@ -164,7 +166,7 @@ DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 
 django_heroku.settings(locals())
 
-
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # send grid
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 

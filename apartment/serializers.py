@@ -29,7 +29,9 @@ class ApartmentSerializer(serializers.Serializer):
     number_of_bathrooms = serializers.IntegerField()
     price = serializers.IntegerField()
     discount = serializers.FloatField()
-    type = serializers.SlugRelatedField(slug_field="category", queryset=Category.objects.all())
+    type = serializers.SlugRelatedField(
+        slug_field="category",
+        queryset=Category.objects.all())
     amenities = serializers.CharField()
     rules = serializers.CharField()
     is_active = serializers.BooleanField()
@@ -126,7 +128,8 @@ class ReviewSerializer(serializers.Serializer):
 
 
 class ImageSerializer(serializers.Serializer):
-    apartment = serializers.SlugRelatedField(slug_field="uuid", queryset=Apartment.objects.all())
+    apartment = serializers.SlugRelatedField(
+        slug_field="uuid", queryset=Apartment.objects.all())
     image = serializers.CharField()
 
     def create(self, validated_data):
@@ -139,7 +142,10 @@ class ImageSerializer(serializers.Serializer):
 
 class BookingSerializer(serializers.Serializer):
     client = serializers.CharField()
-    apartment = serializers.SlugRelatedField(slug_field="uuid", queryset=Apartment.objects.filter(is_active=True))
+    apartment = serializers.SlugRelatedField(
+        slug_field="uuid",
+        queryset=Apartment.objects.filter(
+            is_active=True))
     date_from = serializers.DateField()
     date_to = serializers.DateField()
     check_in = serializers.TimeField()
@@ -157,20 +163,26 @@ class BookingSerializer(serializers.Serializer):
         if attrs['number_of_rooms'] == 0:
             raise serializers.ValidationError("you cannot book 0 rooms")
         # Check active bookings for the apartment to know if room is available
-        active_bookings = ActiveBooking.objects.filter(apartment=attrs['apartment'], is_active=True)
+        active_bookings = ActiveBooking.objects.filter(
+            apartment=attrs['apartment'], is_active=True)
         booked_room_for_apartment = 0
         for booking in active_bookings:
             booked_room_for_apartment += booking.number_of_rooms
 
-        available_rooms = attrs['apartment'].available_rooms - booked_room_for_apartment
+        available_rooms = attrs['apartment'].available_rooms - \
+            booked_room_for_apartment
         if attrs['number_of_rooms'] > available_rooms:
-            raise serializers.ValidationError("not enough rooms, available rooms are " + str(available_rooms))
+            raise serializers.ValidationError(
+                "not enough rooms, available rooms are " +
+                str(available_rooms))
 
         if attrs['date_from'] < attrs['apartment'].available_from:
-            raise serializers.ValidationError("apartment is not available at this time")
+            raise serializers.ValidationError(
+                "apartment is not available at this time")
 
         if attrs['date_to'] > attrs['apartment'].available_to:
-            raise serializers.ValidationError("apartment is not available till this time")
+            raise serializers.ValidationError(
+                "apartment is not available till this time")
 
         return attrs
 
@@ -187,8 +199,14 @@ class BookingSerializer(serializers.Serializer):
 
 
 class RatingSerializer(serializers.Serializer):
-    apartment = serializers.SlugRelatedField(slug_field="uuid", queryset=Apartment.objects.filter(is_active=True))
-    given_by = serializers.SlugRelatedField(slug_field="uuid", queryset=UserProfile.objects.filter(is_active=True))
+    apartment = serializers.SlugRelatedField(
+        slug_field="uuid",
+        queryset=Apartment.objects.filter(
+            is_active=True))
+    given_by = serializers.SlugRelatedField(
+        slug_field="uuid",
+        queryset=UserProfile.objects.filter(
+            is_active=True))
     rating = serializers.IntegerField()
 
     def create(self, validated_data):

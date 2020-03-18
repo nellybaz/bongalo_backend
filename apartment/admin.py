@@ -13,12 +13,36 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ApartmentAdmin(admin.ModelAdmin):
-    list_display = ("title", "owner", "description", "main_image", "available_rooms", "number_of_bathrooms", "max_guest_number", "address", "country", "price", "discount",
-                    "type", "amenities", "rules", "is_verified", "is_active", "unavailable_from", "unavailable_to", "check_in", "check_out")
+    list_display = (
+        "title",
+        "owner",
+        "description",
+        "main_image",
+        "available_rooms",
+        "number_of_bathrooms",
+        "max_guest_number",
+        "address",
+        "country",
+        "price",
+        "discount",
+        "type",
+        "amenities",
+        "rules",
+        "is_verified",
+        "is_active",
+        "unavailable_from",
+        "unavailable_to",
+        "check_in",
+        "check_out")
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ("given_by", "apartment", "review", "is_active", "created_at")
+    list_display = (
+        "given_by",
+        "apartment",
+        "review",
+        "is_active",
+        "created_at")
 
 
 class AmenityAdmin(admin.ModelAdmin):
@@ -26,7 +50,15 @@ class AmenityAdmin(admin.ModelAdmin):
 
 
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ("apartment", "client", "number_of_rooms", "number_of_guest", "date_from", "date_to", "check_in", "check_out")
+    list_display = (
+        "apartment",
+        "client",
+        "number_of_rooms",
+        "number_of_guest",
+        "date_from",
+        "date_to",
+        "check_in",
+        "check_out")
 
 
 admin.site.register(Amenity, AmenityAdmin)

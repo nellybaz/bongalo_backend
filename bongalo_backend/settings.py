@@ -22,6 +22,8 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     'apartment',
     'authentication',
+    'payment',
+    'booking',
     'django_filters',
     'rest_framework',
     'blog',
@@ -154,7 +156,9 @@ AUTHENTICATION_BACKENDS = (
 CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8080",
     "http://localhost:8080",
-    "https://bongalo-frontend.herokuapp.com"
+    "https://bongalo-frontend.herokuapp.com",
+    "http://192.168.43.72:8080",
+    "http://192.168.60.72:8080",
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

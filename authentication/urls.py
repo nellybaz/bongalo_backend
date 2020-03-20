@@ -14,11 +14,7 @@ urlpatterns = [
     path('user/update-profile-image', views.UpdateProfileImage.as_view(), name="update_profile_image"),
     path('user/update-payment', views.PaymentMethod.as_view(), name="update_payment"),
     path('user/get-payment', views.PaymentMethod.as_view(), name="get_payment"),
-    path('verify-email', views.VerifyEmail.as_view(), name="verify_email"),
-
-
-
-
+    path('verify-email', views.VerifyEmail.as_view(), name="verify_email")
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -43,14 +43,6 @@ def send_sms(to, message):
     print(response.json())
 
 
-#
-# def send_verification_pin(profile_id):
-#     profile = Profile.objects.get(uuid=profile_id)
-#     phone = profile.user.username
-#     pin = VerifyProfile.objects.get(user=profile).pin
-#     message = "Your PledgeMaster verification pin is " + pin
-#     send_sms(phone, message)
-
 class VerifyEmail(APIView):
     def post(self, request):
         pin = request.data['pin']
@@ -76,7 +68,8 @@ class VerifyEmail(APIView):
                 return Response(data=response, status=status.HTTP_200_OK)
             response = {
                 'responseCode': 0,
-                'data': 'Wrong pin'
+                'data': 'Wrong pin',
+                'message': 'Wrong pin'
             }
             return Response(data=response, status=status.HTTP_200_OK)
         except:
@@ -103,16 +96,20 @@ class LoginView(APIView):
                 token = Token.objects.get(user=user)
                 response_data = {'responseCode': 1, 'data': {"first_name": profile.user.first_name,
                                                              "last_name": profile.user.last_name,
-                                                             "email": profile.user.email, "profile_image":
-                                                                 profile.profile_image, "uuid": profile.uuid,
+                                                             "email": profile.user.email,
+                                                             "profile_image":
+                                                                 profile.profile_image,
+                                                             'phone_number': profile.phone,
+                                                             "uuid": profile.uuid,
                                                              "token": token.key}
                                  }
                 return Response(data=response_data, status=status.HTTP_200_OK)
             else:
-                response_data = {'responseCode': 0, 'data': "user account is not active"}
+                response_data = {'responseCode': 0, 'data': "user account is not active", "message": "Email is not "
+                                                                                                     "verified"}
                 return Response(data=response_data, status=status.HTTP_200_OK)
 
-        response_data = {'responseCode': 0, 'data': "login failed"}
+        response_data = {'responseCode': 0, 'data': "login failed", "message": "Email and password do not match"}
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 

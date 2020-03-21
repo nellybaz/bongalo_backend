@@ -1,5 +1,8 @@
 import os
 import django_heroku
+import sys
+import logging
+
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -172,3 +175,7 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'info@bongalo.co'
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "Email sent from Bongalo"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# disable logging while testing
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    logging.disable(logging.CRITICAL)

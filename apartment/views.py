@@ -28,6 +28,7 @@ class ApartmentUpdateDeleteAPIView(APIView):
 
     def put(self, request):
         apartment_uuid = request.data.pop('uuid')
+        # TODO:  what happens when when I am not an owner
         apartment_exists = Apartment.objects.filter(uuid=apartment_uuid)
         if apartment_exists.exists():
             apartment = Apartment.objects.get(uuid=apartment_uuid)
@@ -58,7 +59,6 @@ class ApartmentUpdateDeleteAPIView(APIView):
             return Response(data=response_data, status=status.HTTP_200_OK)
 
     def delete(self, request):
-        print("delete called")
         _apartment_exists = Apartment.objects.filter(uuid=request.data['uuid'])
         if _apartment_exists.exists():
             apartment = Apartment.objects.get(uuid=request.data['uuid'])

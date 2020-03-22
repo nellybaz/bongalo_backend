@@ -296,7 +296,7 @@ class SearchApartmentTest(BaseApartmentTest):
         self.assertIsInstance(response_data.get('results'), list)
         self.assertIsNotNone(response_data.get('results'))
     
-    # TODO: this need to be fixed
+    # TODO: this need to be fixed it's not testing the portion it's supposed to test
     def test_return_empty_if_no_criteria(self):
         response = self.client.get(self.search_apartments, {'guest': 100, 'type': 'unknow'})
         response_data = response.data

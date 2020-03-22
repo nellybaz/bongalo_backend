@@ -8,8 +8,8 @@ class UserFactory(DjangoModelFactory):
     username = Faker('text')
     password = 'a-fake-password'
     is_superuser = Faker('boolean')
-    is_staff = Faker('boolean')
-    is_active = Faker('boolean')
+    is_staff = False
+    is_active = True
 
     @classmethod
     def _prepare(cls, create, **kwargs):

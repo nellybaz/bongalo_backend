@@ -196,12 +196,15 @@ class DeleteApartmentTests(BaseApartmentTest):
             data=json.dumps(data),
             content_type='application/json')
         returned_data = response.data
-        deleted_apartment = Apartment.objects.filter(uuid=apartment.uuid).first()
+        deleted_apartment = Apartment.objects.filter(
+            uuid=apartment.uuid).first()
         self.assertFalse(deleted_apartment.is_active)
         self.assertEqual(returned_data.get('statusCode'), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(returned_data.get('data'), "apartment deleted successfully")
-    
+        self.assertEqual(
+            returned_data.get('data'),
+            "apartment deleted successfully")
+
     def test_cannot_delete_apartment_already_deleted(self):
         apartment = ApartmentWithImagesFactory()
         apartment.is_active = False
@@ -214,9 +217,14 @@ class DeleteApartmentTests(BaseApartmentTest):
         returned_data = response.data
         self.assertEqual(returned_data.get('statusCode'), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(returned_data.get('data'), "apartment already deleted")
+        self.assertEqual(
+            returned_data.get('data'),
+            "apartment already deleted")
 
     def test_cannot_delete_apartment_if_not_owner(self):
+        """
+        Once the other part of update is fixed this will be fixed
+        """
         pass
 
     def test_cannot_delete_apartment_if_not_exist(self):
@@ -228,4 +236,72 @@ class DeleteApartmentTests(BaseApartmentTest):
         returned_data = response.data
         self.assertEqual(returned_data.get('statusCode'), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(returned_data.get('data'), "apartment does not exists")
+        self.assertEqual(
+            returned_data.get('data'),
+            "apartment does not exists")
+
+
+class SearchApartmentTest(BaseApartmentTest):
+    def setUp(self):
+        super().setUp()
+        self.apartment = ApartmentWithImagesFactory()
+        self.apartment.max_guest_number = 6
+        self.check_in = '10/03/2020'
+        self.check_out = '15/03/2020'
+        self.apartment.unavailable_from = '2020-03-16'
+        self.apartment.unavailable_to = '2020-03-20'
+        self.apartment.save()
+
+    def test_search_apartment_all(self):
+        response = self.client.get(self.search_apartments,
+                                   {'guest': 5, 'type': 'all'})
+        response_data = response.data
+        self.assertEqual(response_data.get('responseCode'), 1)
+        self.assertEqual(response_data.get('count'), 1)
+        self.assertIsInstance(response_data.get('results'), list)
+        self.assertIsNotNone(response_data.get('results'))
+
+    def test_search_apartment_not_all(self):
+        self.apartment.space = 'commercial'
+        self.apartment.save()
+        response = self.client.get(self.search_apartments,
+                                   {'guest': 5, 'type': 'commercial'})
+        response_data = response.data
+        self.assertEqual(response_data.get('responseCode'), 1)
+        self.assertEqual(response_data.get('count'), 1)
+        self.assertIsInstance(response_data.get('results'), list)
+        self.assertIsNotNone(response_data.get('results'))
+
+    def test_check_in_checkout_all(self):
+        response = self.client.get(
+            self.search_apartments, {
+                'guest': 5, 'type': 'all', 'checkin': self.check_in, "checkout": self.check_out})
+        response_data = response.data
+        self.assertEqual(response_data.get('responseCode'), 1)
+        self.assertEqual(response_data.get('count'), 1)
+        self.assertIsInstance(response_data.get('results'), list)
+        self.assertIsNotNone(response_data.get('results'))
+
+    def test_check_in_checkout_not_all(self):
+        self.apartment.space = 'commercial'
+        self.apartment.save()
+        response = self.client.get(self.search_apartments,
+                                   {'guest': 5,
+                                    'type': 'commercial',
+                                    'checkin': self.check_in,
+                                    "checkout": self.check_out})
+        response_data = response.data
+        self.assertEqual(response_data.get('responseCode'), 1)
+        self.assertEqual(response_data.get('count'), 1)
+        self.assertIsInstance(response_data.get('results'), list)
+        self.assertIsNotNone(response_data.get('results'))
+    
+    # TODO: this need to be fixed
+    def test_return_empty_if_no_criteria(self):
+        response = self.client.get(self.search_apartments, {'guest': 100, 'type': 'unknow'})
+        response_data = response.data
+        self.assertEqual(response_data.get('responseCode'), 1)
+        self.assertEqual(response_data.get('count'), 0)
+        self.assertIsInstance(response_data.get('results'), list)
+        self.assertFalse(response_data.get('results'))
+        

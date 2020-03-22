@@ -116,6 +116,7 @@ class ApartmentListAPIView(ListAPIView):
     queryset = Apartment.objects.filter(is_active=True, is_available=True)
 
 
+# TODO : This need refractoring
 # Receives location, check_in, check_out and returns filtered query
 class ApartmentSearchAPIView(APIView):
 

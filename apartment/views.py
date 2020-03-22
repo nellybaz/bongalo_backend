@@ -211,6 +211,8 @@ class ApartmentSearchAPIView(APIView):
         }
         return Response(data=response, status=status.HTTP_200_OK)
 
+# the rest should be in another file
+
 
 class ReviewListUpdateCreate(APIView):
     authentication_classes = [TokenAuthentication]

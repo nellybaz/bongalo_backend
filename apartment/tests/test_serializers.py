@@ -2,6 +2,7 @@ from django.test import TestCase
 from apartment.serializers import ApartmentSerializer
 from .factories import ApartmentWithImagesFactory
 from rest_framework.serializers import ValidationError
+from .utils import apartment_field_names
 
 
 class ApartmentSerializersTest(TestCase):
@@ -13,28 +14,7 @@ class ApartmentSerializersTest(TestCase):
     def test_apartment_serializer(self):
         """ test if all field in the models are in the serializers"""
         data = self.serializer.data
-        field_names = ["uuid",
-                       "title",
-                       "owner",
-                       "main_image",
-                       "description",
-                       "available_rooms",
-                       "max_guest_number",
-                       "country",
-                       "number_of_bathrooms",
-                       "price",
-                       "discount",
-                       "type",
-                       "amenities",
-                       "rules",
-                       "is_active",
-                       "is_verified",
-                       "unavailable_from",
-                       "unavailable_to",
-                       "check_in",
-                       "check_out",
-                       "min_nights",
-                       "max_nights"]
+        field_names = apartment_field_names
         for field in field_names:
             self.assertEqual(
                 str(data.get(field)),

@@ -6,7 +6,7 @@ from factory import DjangoModelFactory, Faker, SubFactory
 class UserFactory(DjangoModelFactory):
     email = Faker('email')
     username = Faker('text')
-    password = Faker('text')
+    password = 'a-fake-password'
     is_superuser = Faker('boolean')
     is_staff = Faker('boolean')
     is_active = Faker('boolean')

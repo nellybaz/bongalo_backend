@@ -43,7 +43,7 @@ class ApartmentFactory(DjangoModelFactory):
     max_nights = 6
     check_in = Faker('text')   # Timezone is Africa/Kigali
     check_out = Faker('text')  # Timezone is Africa/Kigali
-    is_available = Faker('boolean')
+    is_available = True
     created_at = Faker('date_time')
     # images = RelatedFactory(ImageFactory, 'apartment')
 

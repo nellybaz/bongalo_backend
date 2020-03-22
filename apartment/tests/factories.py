@@ -1,6 +1,7 @@
-from factory import DjangoModelFactory, Faker, SubFactory
-from ..models import Apartment, Category
+from factory import DjangoModelFactory, Faker, SubFactory, post_generation
+from ..models import Apartment, Category, Images
 from authentication.tests.factories import UserProfileFactory
+from random import randint
 
 
 class CategoryFactory(DjangoModelFactory):
@@ -44,6 +45,38 @@ class ApartmentFactory(DjangoModelFactory):
     check_out = Faker('text')  # Timezone is Africa/Kigali
     is_available = Faker('boolean')
     created_at = Faker('date_time')
+    # images = RelatedFactory(ImageFactory, 'apartment')
 
     class Meta:
         model = Apartment
+
+
+class ImageFactory(DjangoModelFactory):
+    uuid = Faker('uuid4')
+    apartment = SubFactory(ApartmentFactory)
+    image = Faker('text')
+    created_at = Faker('date_time')
+
+    class Meta:
+        model = Images
+
+
+class ApartmentWithImagesFactory(ApartmentFactory):
+    @post_generation
+    def images(self, create, extracted, **kwargs):
+        """
+        If called like: ApartmentFactor(images=4) it generates a apartment with 4
+        images.  If called without `images` argument, it generates a
+        random amount of images for this apartment
+        """
+        if not create:
+            # Build, not create related
+            return
+
+        if extracted:
+            for n in range(extracted):
+                ImageFactory(apartment=self)
+        else:
+            number_of_units = randint(1, 10)
+            for n in range(number_of_units):
+                ImageFactory(apartment=self)

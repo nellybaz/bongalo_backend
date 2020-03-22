@@ -26,10 +26,6 @@ class ApartmentUpdateDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOnly]
     authentication_classes = [TokenAuthentication]
 
-    # serializer_class = ApartmentSerializer
-    #     # queryset = Apartment.objects.all()
-    #     # lookup_field = "uid"
-
     def put(self, request):
         apartment_uuid = request.data.pop('uuid')
         apartment_exists = Apartment.objects.filter(uuid=apartment_uuid)

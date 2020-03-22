@@ -11,12 +11,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["category"]
 
 
-# class ImagesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Images
-#         fields = ('apartment', 'image')
-
-
 class ApartmentSerializer(serializers.Serializer):
     uuid = serializers.CharField(read_only=True)
     title = serializers.CharField()
@@ -50,31 +44,11 @@ class ApartmentSerializer(serializers.Serializer):
             return value
         raise serializers.ValidationError("user does not exists")
 
-    # def validate_type(self, value):
-    #     if not Category.objects.filter(category=value).exists():
-    #         raise serializers.ValidationError("category type does not exits")
-    #     return value
-
     def update(self, instance, validated_data):
         instance.title = validated_data['title']
-        # instance.main_image = validated_data['main_image']
         instance.description = validated_data['description']
         instance.price = validated_data['price']
-        # instance.available_rooms = validated_data['available_rooms']
-        # instance.country = validated_data['country']
-        # instance.number_of_bathrooms = validated_data['number_of_bathrooms']
-        # instance.max_guest_number = validated_data['max_guest_number']
-        # instance.discount = validated_data['discount']
-        # instance.amenities = validated_data['amenities']
-        # instance.rules = validated_data['rules']
-        # instance.is_active = validated_data['is_active']
-        # instance.is_verified = validated_data['is_verified']
-        # instance.check_in = validated_data['check_in']
-        # instance.check_out = validated_data['check_out']
-        # instance.available_from = validated_data["available_from"] if "available_from" in validated_data else instance.available_from
-        # instance.available_to = validated_data["available_to"] if "available_to" in validated_data else instance.available_to
         instance.save()
-
         return instance
 
     def create(self, validated_data):

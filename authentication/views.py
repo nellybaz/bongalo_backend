@@ -15,7 +15,7 @@ from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
 from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
-
+from bongalo_backend.settings import PINDO_API_TOKEN
 
 def send_email(to, subject, message):
     send_mail(
@@ -28,7 +28,8 @@ def send_email(to, subject, message):
 
 
 def send_sms(to, message):
-    token = "eyJhbGciOiJub25lIn0.eyJpZCI6MjAsInJldm9rZWRfdG9rZW5fY291bnQiOjB9."
+    # TODO : Put token in dotenv files need to be refractored
+    token = PINDO_API_TOKEN
     headers = {'Authorization': 'Bearer ' + token}
 
     # Add country code if not present
@@ -248,7 +249,6 @@ class DeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
-        print("deleted called =======>")
         is_exists = User.objects.filter(username=request.data['username'])
         if is_exists.exists():
             user = User.objects.get(username=request.data['username'])

@@ -7,7 +7,7 @@ source = .
 exclude_lines =
 ignore_errors = True
 show_missing = False
-skip_covered = True
+skip_covered = False
 
 [html]
 directory = htmlcov

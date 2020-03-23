@@ -172,6 +172,7 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'info@bongalo.co'
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "Email sent from Bongalo"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+PINDO_API_TOKEN = os.getenv('PINDO_API_TOKEN')
 
 # disable logging while testing
 if len(sys.argv) > 1 and sys.argv[1] == 'test':

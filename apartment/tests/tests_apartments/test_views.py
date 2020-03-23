@@ -6,7 +6,7 @@ from rest_framework import status
 from authentication.tests.factories import UserProfileFactory
 from .utils import apartment_field_names
 from .factories import ApartmentWithImagesFactory, CategoryFactory
-from ..models import Apartment
+from apartment.models import Apartment
 
 
 class BaseApartmentTest(APITestCase):
@@ -304,4 +304,3 @@ class SearchApartmentTest(BaseApartmentTest):
         self.assertEqual(response_data.get('count'), 0)
         self.assertIsInstance(response_data.get('results'), list)
         self.assertFalse(response_data.get('results'))
-        

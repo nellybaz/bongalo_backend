@@ -1,5 +1,5 @@
 from factory import DjangoModelFactory, Faker, SubFactory, post_generation
-from ..models import Apartment, Category, Images
+from apartment.models import Apartment, Category, Images
 from authentication.tests.factories import UserProfileFactory
 from random import randint
 

@@ -15,9 +15,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PinVerify',
             fields=[
-                ('uuid', models.CharField(default=uuid.uuid4, max_length=100, primary_key=True, serialize=False, unique=True)),
-                ('pin', models.CharField(max_length=10)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='authentication.UserProfile')),
+                ('uuid',
+                 models.CharField(
+                     default=uuid.uuid4,
+                     max_length=100,
+                     primary_key=True,
+                     serialize=False,
+                     unique=True)),
+                ('pin',
+                 models.CharField(
+                     max_length=10)),
+                ('user',
+                 models.OneToOneField(
+                     on_delete=django.db.models.deletion.CASCADE,
+                     to='authentication.UserProfile')),
             ],
         ),
     ]

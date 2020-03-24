@@ -15,7 +15,16 @@ class ReturnedUser:
     is_active = ""
     # profile_image = ""
 
-    def __init__(self, username, first_name, last_name, email, is_admin, is_active, token, uuid):
+    def __init__(
+            self,
+            username,
+            first_name,
+            last_name,
+            email,
+            is_admin,
+            is_active,
+            token,
+            uuid):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
@@ -39,7 +48,8 @@ class UserRegisterSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists() and self.context['request'] == "post":
+        if User.objects.filter(email=value).exists(
+        ) and self.context['request'] == "post":
             raise serializers.ValidationError("email address already used")
         return value
 
@@ -82,7 +92,8 @@ class UserRegisterSerializer(serializers.Serializer):
         token = Token.objects.get(user=user)
 
         profile_data["uuid"] = instance.uuid
-        returned_user = ReturnedUser(**user_data, **profile_data, token=token.key)
+        returned_user = ReturnedUser(
+            **user_data, **profile_data, token=token.key)
 
         return returned_user
 
@@ -126,7 +137,8 @@ class UserRegisterSerializer(serializers.Serializer):
 
         profile_data["uuid"] = profile.uuid
 
-        returned_user = ReturnedUser(**user_data, **profile_data, token=token.key)
+        returned_user = ReturnedUser(
+            **user_data, **profile_data, token=token.key)
 
         return returned_user
 

@@ -5,4 +5,3 @@ from authentication.models import User, UserProfile
 class TestModels(TestCase):
     def setUp(self):
         pass
-

@@ -1,5 +1,8 @@
 import os
 import django_heroku
+import sys
+import logging
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'r3pbs13sge&2w^rsi6qji#kfqj_e9sxqfq%94vgkx$qa74z1j#'
+SECRET_KEY = os.getenv("SECRET_KEY", "a-fake-secret-key-to-make-github-action-work")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -36,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -75,9 +79,9 @@ WSGI_APPLICATION = 'bongalo_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME':  'bongalo',
@@ -88,13 +92,6 @@ DATABASES = {
     #
     # }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 
 # Password validation
@@ -151,7 +148,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8080",
@@ -164,15 +160,20 @@ DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 
 django_heroku.settings(locals())
 
-
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # send grid
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'nellybaz'
-EMAIL_HOST_PASSWORD = "XFerGzwPmnL+/d4"
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'info@bongalo.co'
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "Email sent from Bongalo"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+PINDO_API_TOKEN = os.getenv('PINDO_API_TOKEN')
+
+# disable logging while testing
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    logging.disable(logging.CRITICAL)

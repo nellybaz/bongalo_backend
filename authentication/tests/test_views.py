@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from authentication.models import User, UserProfile
 from rest_framework.test import APIClient, force_authenticate
-from authentication.views import LoginAPIView
+# from authentication.views import LoginAPIView
 from rest_framework.authtoken.models import Token
 
 

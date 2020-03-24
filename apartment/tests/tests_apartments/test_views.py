@@ -52,17 +52,22 @@ class ListApartmentTest(BaseApartmentTest):
 
     test list apartment endpoint
     """
+    def setUp(self):
+        super().setUp()
+        self.apartments = [ApartmentWithImagesFactory.create() for i in range(6)]
 
     def test_list_apartments(self):
-        apartments = [ApartmentWithImagesFactory.create() for i in range(6)]
+        """
+        Test if when there are apartment in the database , I can list them
+        """
         response = self.client.get(self.all_apartments)
-        self.assertEqual(len(apartments), len(response.data.get('results')))
+        self.assertEqual(len(self.apartments), len(response.data.get('results')))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         apartment_field_names.remove('owner')
         for field in apartment_field_names:
             self.assertEqual(
                 set(str(apartment.get(field)) for apartment in response.data.get('results')),
-                set(str(getattr(apartment, field)) for apartment in apartments)
+                set(str(getattr(apartment, field)) for apartment in self.apartments)
             )
 
 

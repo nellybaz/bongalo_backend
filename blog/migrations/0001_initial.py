@@ -14,9 +14,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Post',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(blank=True, default='', max_length=100)),
-                ('body', models.CharField(blank=True, default='', max_length=100)),
+                ('id',
+                 models.AutoField(
+                     auto_created=True,
+                     primary_key=True,
+                     serialize=False,
+                     verbose_name='ID')),
+                ('title',
+                 models.CharField(
+                     blank=True,
+                     default='',
+                     max_length=100)),
+                ('body',
+                 models.CharField(
+                     blank=True,
+                     default='',
+                     max_length=100)),
             ],
         ),
     ]

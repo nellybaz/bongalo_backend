@@ -15,7 +15,7 @@ from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
 from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
-
+from bongalo_backend.settings import PINDO_API_TOKEN
 
 def send_email(to, subject, message):
     send_mail(
@@ -28,7 +28,8 @@ def send_email(to, subject, message):
 
 
 def send_sms(to, message):
-    token = "eyJhbGciOiJub25lIn0.eyJpZCI6MjAsInJldm9rZWRfdG9rZW5fY291bnQiOjB9."
+    # TODO : Put token in dotenv files need to be refractored
+    token = PINDO_API_TOKEN
     headers = {'Authorization': 'Bearer ' + token}
 
     # Add country code if not present
@@ -72,7 +73,7 @@ class VerifyEmail(APIView):
                 'message': 'Wrong pin'
             }
             return Response(data=response, status=status.HTTP_200_OK)
-        except:
+        except BaseException:
             response = {
                 'responseCode': 0,
                 'data': 'Error occurred'
@@ -94,19 +95,20 @@ class LoginView(APIView):
             if profile.is_active:
                 # Get token
                 token = Token.objects.get(user=user)
-                response_data = {'responseCode': 1, 'data': {"first_name": profile.user.first_name,
-                                                             "last_name": profile.user.last_name,
-                                                             "email": profile.user.email,
-                                                             "profile_image":
-                                                                 profile.profile_image,
-                                                             'phone_number': profile.phone,
-                                                             "uuid": profile.uuid,
-                                                             "token": token.key}
-                                 }
+                response_data = {
+                    'responseCode': 1,
+                    'data': {
+                        "first_name": profile.user.first_name,
+                        "last_name": profile.user.last_name,
+                        "email": profile.user.email,
+                        "profile_image": profile.profile_image,
+                        "uuid": profile.uuid,
+                        "token": token.key}}
                 return Response(data=response_data, status=status.HTTP_200_OK)
             else:
-                response_data = {'responseCode': 0, 'data': "user account is not active", "message": "Email is not "
-                                                                                                     "verified"}
+                response_data = {
+                    'responseCode': 0,
+                    'data': "user account is not active"}
                 return Response(data=response_data, status=status.HTTP_200_OK)
 
         response_data = {'responseCode': 0, 'data': "login failed", "message": "Email and password do not match"}
@@ -117,12 +119,19 @@ class UserRegisterViews(APIView):
     def post(self, request):  # Handle user registration
         verification_pin = ''.join(random.sample('0123456789', 5))
 
-        serialized = UserRegisterSerializer(data=request.data, context={"request": "post", "pin_code": verification_pin}
-                                            , partial=True)
+        serialized = UserRegisterSerializer(
+            data=request.data,
+            context={
+                "request": "post",
+                "pin_code": verification_pin},
+            partial=True)
         if serialized.is_valid():
             serialized.save()
-            send_email(request.data['email'], "Bongalo Email Verification", "Hi, \nYour pin verification is " +
-                       verification_pin)
+            send_email(
+                request.data['email'],
+                "Bongalo Email Verification",
+                "Hi, \nYour pin verification is " +
+                verification_pin)
 
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)
@@ -142,18 +151,26 @@ class SocialAuth(APIView):
             if profile.is_active:
                 # Get token
                 token = Token.objects.get(user=user)
-                response_data = {'responseCode': 1, 'data': {"email": profile.user.username,
-                                                             "first_name": profile.user.first_name,
-                                                             "profile_image": profile.profile_image,
-                                                             "last_name": profile.user.last_name, "uuid":
-                                                                 profile.uuid, "token": token.key}}
+                response_data = {
+                    'responseCode': 1,
+                    'data': {
+                        "email": profile.user.username,
+                        "first_name": profile.user.first_name,
+                        "profile_image": profile.profile_image,
+                        "last_name": profile.user.last_name,
+                        "uuid": profile.uuid,
+                        "token": token.key}}
 
                 return Response(data=response_data, status=status.HTTP_200_OK)
             else:
-                response_data = {'responseCode': 0, 'data': "user does not exists anymore"}
+                response_data = {
+                    'responseCode': 0,
+                    'data': "user does not exists anymore"}
                 return Response(data=response_data, status=status.HTTP_200_OK)
 
-        serialized = UserRegisterSerializer(data=request.data, context={"request": "post"}, partial=True)
+        serialized = UserRegisterSerializer(
+            data=request.data, context={
+                "request": "post"}, partial=True)
         if serialized.is_valid():
             serialized.save()
             response_data = {'responseCode': 1, 'data': serialized.data}
@@ -199,8 +216,10 @@ class UserView(APIView):
             profile = UserProfile.objects.get(uuid=request.data['user'])
 
             # Check if user can update account
-            if not check_token_autorization.check_token_authorization(profile, request):
-                response_data = {'responseCode': 0, 'data': "This user cannot update this account"}
+            if not check_token_autorization.check_token_authorization(
+                    profile, request):
+                response_data = {'responseCode': 0,
+                                 'data': "This user cannot update this account"}
                 return Response(data=response_data, status=status.HTTP_200_OK)
             self.check_object_permissions(request, profile)
 
@@ -213,11 +232,15 @@ class UserView(APIView):
             profile.save()
             user.save()
 
-            response_data = {'responseCode': 1, 'data': {"message": "user profile updated"}}
+            response_data = {
+                'responseCode': 1, 'data': {
+                    "message": "user profile updated"}}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
         else:
-            response_data = {'responseCode': 0, 'data': {"error": "user does not exists"}}
+            response_data = {
+                'responseCode': 0, 'data': {
+                    "error": "user does not exists"}}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
 
@@ -226,27 +249,36 @@ class DeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
-        print("deleted called =======>")
         is_exists = User.objects.filter(username=request.data['username'])
         if is_exists.exists():
             user = User.objects.get(username=request.data['username'])
             profile = UserProfile.objects.get(user=user)
 
             # Check if user can update account
-            if not check_token_autorization.check_token_authorization(user, request):
-                response_data = {'responseCode': 0, 'data': "This user cannot update this account"}
+            if not check_token_autorization.check_token_authorization(
+                    user, request):
+                response_data = {'responseCode': 0,
+                                 'data': "This user cannot update this account"}
                 return Response(data=response_data, status=status.HTTP_200_OK)
 
             if profile.is_active:
                 profile.is_active = False
                 profile.save()
-                response_data = {'responseCode': 1, 'data': {"message": "Deleted successfully"}}
-                return Response(data=response_data, status=status.HTTP_201_CREATED)
+                response_data = {
+                    'responseCode': 1, 'data': {
+                        "message": "Deleted successfully"}}
+                return Response(
+                    data=response_data,
+                    status=status.HTTP_201_CREATED)
             else:
-                response_data = {'responseCode': 0, 'data': {"error": "This User does not exists anymore"}}
+                response_data = {
+                    'responseCode': 0, 'data': {
+                        "error": "This User does not exists anymore"}}
                 return Response(data=response_data, status=status.HTTP_200_OK)
         else:
-            response_data = {'responseCode': 0, 'data': {"error": "User does not exists"}}
+            response_data = {
+                'responseCode': 0, 'data': {
+                    "error": "User does not exists"}}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
 
@@ -256,7 +288,8 @@ class VerifyUserView(APIView):
 
     def put(self, request):
         if "national_id" not in request.data and "passport" not in request.data:
-            response_data = {'responseCode': 0, 'data': "passport or national_id required"}
+            response_data = {'responseCode': 0,
+                             'data': "passport or national_id required"}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
         if not User.objects.filter(username=request.data['username']).exists():
@@ -265,8 +298,10 @@ class VerifyUserView(APIView):
 
         user = User.objects.get(username=request.data['username'])
         request.data.pop("username")
-        serialized = VerifyUserSerializer(UserProfile.objects.get(user=user), data=request.data,
-                                          context={"request": "put"}, partial=True)
+        serialized = VerifyUserSerializer(
+            UserProfile.objects.get(
+                user=user), data=request.data, context={
+                "request": "put"}, partial=True)
         if serialized.is_valid():
             serialized.save()
             response_data = {'responseCode': 1, 'data': serialized.data}
@@ -334,11 +369,14 @@ class PaymentMethod(APIView):
 
         else:
             PaymentMethodModel.objects.create(user=user, momo_number=number)
-        send_email(user.user.email, "Bongalo Payment Info Update", "Hi {0} \nYour mobile number for receiving "
-                                                                   "payments on Bongalo has been changed. If this "
-                                                                   "action was performed by you pls call 0784650455 to "
-                                                                   "cancel immediately"
-                   .format(user.user.first_name))
+        send_email(
+            user.user.email,
+            "Bongalo Payment Info Update",
+            "Hi {0} \nYour mobile number for receiving "
+            "payments on Bongalo has been changed. If this "
+            "action was performed by you pls call 0784650455 to "
+            "cancel immediately" .format(
+                user.user.first_name))
 
         response = {
             "responseCode": 1,

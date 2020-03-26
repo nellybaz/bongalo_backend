@@ -5,7 +5,11 @@ from uuid import uuid4
 
 # User profile model
 class UserProfile(models.Model):
-    uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
+    uuid = models.CharField(
+        primary_key=True,
+        unique=True,
+        default=uuid4,
+        max_length=100)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=225, blank=True, )
     description = models.CharField(max_length=225, default="")
@@ -26,13 +30,21 @@ class UserProfile(models.Model):
 
 
 class PaymentMethod(models.Model):
-    uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
+    uuid = models.CharField(
+        primary_key=True,
+        unique=True,
+        default=uuid4,
+        max_length=100)
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     momo_number = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class PinVerify(models.Model):
-    uuid = models.CharField(primary_key=True, unique=True, default=uuid4, max_length=100)
+    uuid = models.CharField(
+        primary_key=True,
+        unique=True,
+        default=uuid4,
+        max_length=100)
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     pin = models.CharField(max_length=10)

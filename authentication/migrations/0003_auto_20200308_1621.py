@@ -15,15 +15,31 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='userprofile',
             name='profile_image',
-            field=models.CharField(blank=True, default='', max_length=225),
+            field=models.CharField(
+                blank=True,
+                default='',
+                max_length=225),
         ),
         migrations.CreateModel(
             name='PaymentMethod',
             fields=[
-                ('uuid', models.CharField(default=uuid.uuid4, max_length=100, primary_key=True, serialize=False, unique=True)),
-                ('momo_number', models.CharField(max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='authentication.UserProfile')),
+                ('uuid',
+                 models.CharField(
+                     default=uuid.uuid4,
+                     max_length=100,
+                     primary_key=True,
+                     serialize=False,
+                     unique=True)),
+                ('momo_number',
+                 models.CharField(
+                     max_length=20)),
+                ('created_at',
+                 models.DateTimeField(
+                     auto_now_add=True)),
+                ('user',
+                 models.ForeignKey(
+                     on_delete=django.db.models.deletion.CASCADE,
+                     to='authentication.UserProfile')),
             ],
         ),
     ]

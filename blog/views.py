@@ -29,8 +29,8 @@ class CustomSearchFilter(filters.SearchFilter):
         if request.query_params.get('body'):
             fields_to_search.append('body')
 
-        return super(CustomSearchFilter, self).get_search_fields(view, request)\
-            if not fields_to_search else fields_to_search
+        return super(CustomSearchFilter, self).get_search_fields(
+            view, request) if not fields_to_search else fields_to_search
 
 
 # Using Generics
@@ -44,7 +44,9 @@ class PostsList(generics.ListCreateAPIView):
 
 
 class PostDetail2(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly]
     queryset = BlogPost.objects.all()
     serializer_class = PostSerializers
 
@@ -64,7 +66,9 @@ class FilterPost(generics.ListAPIView):
     def get_queryset(self):
         search_title = self.kwargs['name']
         search_body = self.kwargs['body']
-        return BlogPost.objects.filter(title__contains=search_title, body__contains=search_body)
+        return BlogPost.objects.filter(
+            title__contains=search_title,
+            body__contains=search_body)
 
 
 # Using class views
@@ -132,7 +136,9 @@ def posts(request, format=None):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.error_messages,
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])

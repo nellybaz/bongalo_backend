@@ -1,0 +1,13 @@
+[run]
+branch = True
+omit = *tests*, *.venv*, *notebooks*, manage.py
+source = .
+
+[report]
+exclude_lines =
+ignore_errors = True
+show_missing = False
+skip_covered = False
+
+[html]
+directory = htmlcov

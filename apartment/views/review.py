@@ -19,17 +19,19 @@ class ReviewListUpdateCreate(APIView):
         if not query_param:
             response_data = {
                 "responseCode": 0,
-                "data": "bad query params"
+                "data": "bad query params",
+                "message": "bad query params"
             }
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the apartment exits
         if not Apartment.objects.filter(uuid=query_param).exists():
             response_data = {
                 "responseCode": 0,
-                "data": "apartment does not exists"
+                "data": "apartment does not exists",
+                "message": "apartment does not exists"
             }
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         apartment = Apartment.objects.get(uuid=query_param)
         query_set = Review.objects.filter(apartment=apartment, is_active=True)
@@ -43,9 +45,10 @@ class ReviewListUpdateCreate(APIView):
 
         response_data = {
             "responseCode": 0,
-            "data": serialized.errors
+            "data": serialized.errors,
+            'message': 'Error occurred'
         }
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         serialized = ReviewSerializer(
@@ -61,9 +64,10 @@ class ReviewListUpdateCreate(APIView):
 
         response_data = {
             "responseCode": 0,
-            "data": serialized.errors
+            "data": serialized.errors,
+            'message': 'Error occurred'
         }
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request):
         _review_exists = Review.objects.filter(uuid=request.data['uuid'])
@@ -77,8 +81,9 @@ class ReviewListUpdateCreate(APIView):
                 response_data = {
                     "statusCode": 0,
                     "data": "user does not exits",
+                    'message': "user does not exits",
                 }
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.get(username=request.data['given_by'])
 
@@ -86,8 +91,9 @@ class ReviewListUpdateCreate(APIView):
                 response_data = {
                     "statusCode": 0,
                     "data": "user cannot delete the review",
+                    "message": "user cannot delete the review",
                 }
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
             if review.is_active:
                 review.is_active = False
@@ -100,12 +106,14 @@ class ReviewListUpdateCreate(APIView):
             response_data = {
                 "statusCode": 0,
                 "data": "review already deleted",
+                "message": "review already deleted",
             }
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         response_data = {
             "statusCode": 0,
-            "data": "review does not exists"
+            "data": "review does not exists",
+            "message": "review does not exists"
         }
 
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)

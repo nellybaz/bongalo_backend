@@ -19,6 +19,7 @@ from bongalo_backend.settings import PINDO_API_TOKEN
 
 
 def send_email(to, subject, message):
+    print(settings.DEFAULT_FROM_EMAIL)
     send_mail(
         subject,
         message,

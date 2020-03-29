@@ -37,5 +37,5 @@ class ImageView(APIView):
             response_data = {"responseCode": 1, "data": serialized.data}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
-        response_data = {"responseCode": 0, "data": serialized.errors}
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        response_data = {"responseCode": 0, "data": serialized.errors, 'message': 'Error occurred'}
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

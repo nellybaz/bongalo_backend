@@ -24,9 +24,10 @@ class ListingView(APIView):
 
         response = {
             "responseCode": 0,
-            "data": "user does not exists"
+            "data": "user does not exists",
+            "message": "user does not exists",
         }
-        return Response(data=response, status=status.HTTP_200_OK)
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         user_id = self.request.query_params.get('user')
@@ -46,15 +47,17 @@ class ListingView(APIView):
 
             response = {
                 "responseCode": 0,
-                "data": "apartment is not owned by this user"
+                "data": "apartment is not owned by this user",
+                "message": "apartment is not owned by this user"
             }
-            return Response(data=response, status=status.HTTP_200_OK)
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         response = {
             "responseCode": 0,
-            "data": "user does not exists"
+            "data": "user does not exists",
+            "message": "user does not exists"
         }
-        return Response(data=response, status=status.HTTP_200_OK)
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request):
         user_id = request.data['user']
@@ -73,12 +76,14 @@ class ListingView(APIView):
 
             response = {
                 "responseCode": 0,
-                "data": "apartment is not owned by this user"
+                "data": "apartment is not owned by this user",
+                "message": "apartment is not owned by this user"
             }
-            return Response(data=response, status=status.HTTP_200_OK)
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         response = {
             "responseCode": 0,
-            "data": "user does not exists"
+            "data": "user does not exists",
+            "message": "user does not exists"
         }
-        return Response(data=response, status=status.HTTP_200_OK)
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)

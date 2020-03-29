@@ -2,7 +2,7 @@ from blog.models import Post
 from rest_framework import serializers
 
 
-class PostSerializers(serializers.ModelSerializer):
+class BlogPostSerializers(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['title', 'body']
+        fields = ['uuid', 'title', 'body', 'tag', 'created_at', 'is_featured']

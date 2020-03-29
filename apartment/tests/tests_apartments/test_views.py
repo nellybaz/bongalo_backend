@@ -103,7 +103,7 @@ class CreateApartmentTest(BaseApartmentTest):
             self.add_apartment,
             data=self.new_apartment_data)
         self.assertEqual(response.data.get('statusCode'), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_raise_error_when_no_owner(self):
         response = self.client.post(
@@ -112,7 +112,7 @@ class CreateApartmentTest(BaseApartmentTest):
         self.assertEqual(str(response.data.get('data').get(
             'owner')[0]), "user does not exists")
         self.assertEqual(response.data.get('statusCode'), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_raise_error_when_no_images(self):
         self.new_apartment_data['owner'] = self.user_profile.uuid
@@ -121,7 +121,7 @@ class CreateApartmentTest(BaseApartmentTest):
             self.add_apartment,
             data=self.new_apartment_data)
         self.assertEqual(response.data.get('statusCode'), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_raise_401_when_not_login(self):
         self.client.logout()
@@ -185,7 +185,7 @@ class UpdateApartmentTest(BaseApartmentTest):
         self.assertEqual(
             returned_data.get('data'),
             "apartment does not exists")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_data_serializer_invalid(self):
         pass
@@ -221,7 +221,7 @@ class DeleteApartmentTests(BaseApartmentTest):
             content_type='application/json')
         returned_data = response.data
         self.assertEqual(returned_data.get('statusCode'), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             returned_data.get('data'),
             "apartment already deleted")
@@ -240,7 +240,7 @@ class DeleteApartmentTests(BaseApartmentTest):
             content_type='application/json')
         returned_data = response.data
         self.assertEqual(returned_data.get('statusCode'), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             returned_data.get('data'),
             "apartment does not exists")

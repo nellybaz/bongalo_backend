@@ -48,6 +48,10 @@ urlpatterns = [
         'verify-email',
         views.VerifyEmail.as_view(),
         name="verify_email"),
+    path(
+        'user/reset-password',
+        views.ResetPasswordView.as_view(),
+        name="reset_password"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

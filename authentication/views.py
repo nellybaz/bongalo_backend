@@ -13,18 +13,23 @@ from rest_framework.views import APIView
 
 from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
-from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify
+from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify, PasswordReset
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
 from bongalo_backend.settings import PINDO_API_TOKEN
+from cryptography.fernet import Fernet
+from datetime import datetime, timedelta
+import pytz
+
 
 def send_email(to, subject, message):
-    send_mail(
+    res = send_mail(
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
         [to],
         fail_silently=False,
     )
+    print(res)
 
 
 def send_sms(to, message):
@@ -383,3 +388,100 @@ class PaymentMethod(APIView):
             "data": "Payment method added successfully"
         }
         return Response(data=response, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(APIView):
+    """
+    Receive email address, and send an encrypted link of the user's uuid and email to the email address
+    """
+    def post(self, request):
+        user_email = request.data['email']
+        if not UserProfile.objects.filter(user__email=user_email, is_active=True).exists():
+            response = {
+                "responseCode": 0,
+                "message": "User with this email does not exits"
+            }
+
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserProfile.objects.get(user__email=user_email, is_active=True)
+        key = Fernet.generate_key()  # Generate the unique key to encrypt text with
+        message_to_encrypt = "uuid={}&email={}".format(user.uuid, user_email).encode()
+        f_encrypt = Fernet(key)  # Initialize the encrypt object
+        encrypted_message = f_encrypt.encrypt(message_to_encrypt)  # Encrypt the message
+
+        #  Generate the reset link to be sent
+        reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode()+"&email="+user_email
+        print(reset_password_link)
+        send_email(
+            user_email,
+            "Password Reset",
+            "Hi {} \nFollow this link {} to reset your password".format(user.user.first_name, reset_password_link))
+
+        PasswordReset.objects.create(
+            user=user,
+            is_used=False,
+            reset_key=key.decode()
+        )
+        response = {
+            'responseCode': 1,
+            'message': 'Email sent, check your email for a link to reset your password'
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        user_email = request.data['email']
+        if not UserProfile.objects.filter(user__email=user_email, is_active=True).exists():
+            response = {
+                "responseCode": 0,
+                "message": "User with this email does not exits"
+            }
+
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserProfile.objects.get(user__email=user_email, is_active=True)
+        token = request.data['token'].encode()
+
+        # If the link is already used
+        if not PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by('created_at').exists():
+            response = {
+                'responseCode': 0,
+                'message': 'Link invalid, please request to reset password again'
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        password_reset_object = PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by('created_at').first()
+
+        reset_key = password_reset_object.reset_key
+        f_encrypt = Fernet(reset_key.encode())  # Initialize the encrypt object
+        try:
+            decrypted_message = f_encrypt.decrypt(token)
+
+        except BaseException:
+            response = {
+                'responseCode': 0,
+                'message': 'Invalid link/token please make another request to reset password'
+            }
+
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        if decrypted_message.decode() == "uuid={}&email={}".format(user.uuid, user.user.email):
+            user.user.set_password(request.data['password'])
+            user.user.save()
+
+            #  Update the password reset object to used
+            password_reset_object.is_used = True
+            password_reset_object.save()
+
+            response = {
+                'responseCode': 1,
+                'message': 'Password reset successfully'
+            }
+
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            'responseCode': 0,
+            'message': 'Password reset failed'
+        }
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)

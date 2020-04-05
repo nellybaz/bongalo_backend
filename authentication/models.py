@@ -48,3 +48,15 @@ class PinVerify(models.Model):
         max_length=100)
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     pin = models.CharField(max_length=10)
+
+
+class PasswordReset(models.Model):
+    uuid = models.CharField(
+        primary_key=True,
+        unique=True,
+        default=uuid4,
+        max_length=100)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    reset_key = models.CharField(max_length=225)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

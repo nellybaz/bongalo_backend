@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 import pytz
 
 
+
 def send_email(to, subject, message):
     res = send_mail(
         subject,
@@ -77,13 +78,13 @@ class VerifyEmail(APIView):
                 'data': 'Wrong pin',
                 'message': 'Wrong pin'
             }
-            return Response(data=response, status=status.HTTP_200_OK)
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
         except BaseException:
             response = {
                 'responseCode': 0,
                 'data': 'Error occurred'
             }
-            return Response(data=response, status=status.HTTP_200_OK)
+            return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LoginView(APIView):
@@ -113,11 +114,13 @@ class LoginView(APIView):
             else:
                 response_data = {
                     'responseCode': 0,
-                    'data': "user account is not active"}
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                    'data': "user account is not active"
+                    'message' "user account is not active"
+                }
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         response_data = {'responseCode': 0, 'data': "login failed", "message": "Email and password do not match"}
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserRegisterViews(APIView):
@@ -141,8 +144,8 @@ class UserRegisterViews(APIView):
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
-        response_data = {'responseCode': 0, 'data': serialized.errors}
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        response_data = {'responseCode': 0, 'data': serialized.errors, 'message': 'error occurred'}
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SocialAuth(APIView):
@@ -170,8 +173,10 @@ class SocialAuth(APIView):
             else:
                 response_data = {
                     'responseCode': 0,
-                    'data': "user does not exists anymore"}
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                    'data': "user does not exists anymore",
+                    'message': 'user does not exists anymore'
+                }
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         serialized = UserRegisterSerializer(
             data=request.data, context={
@@ -181,8 +186,8 @@ class SocialAuth(APIView):
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
-        response_data = {'responseCode': 0, 'data': serialized.errors}
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        response_data = {'responseCode': 0, 'data': serialized.errors, 'message': 'error occurred'}
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserView(APIView):
@@ -211,9 +216,10 @@ class UserView(APIView):
 
         res = {
             'responseCode': 0,
-            'data': 'user does not exists'
+            'data': 'user does not exists',
+            'message': 'user does not exists'
         }
-        return Response(data=res, status=status.HTTP_200_OK)
+        return Response(data=res, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         is_exists = UserProfile.objects.filter(uuid=request.data['user'])
@@ -224,8 +230,10 @@ class UserView(APIView):
             if not check_token_autorization.check_token_authorization(
                     profile, request):
                 response_data = {'responseCode': 0,
-                                 'data': "This user cannot update this account"}
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                                 'data': "This user cannot update this account",
+                                 'message': "This user cannot update this account"
+                                 }
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
             self.check_object_permissions(request, profile)
 
             user = profile.user
@@ -245,8 +253,10 @@ class UserView(APIView):
         else:
             response_data = {
                 'responseCode': 0, 'data': {
-                    "error": "user does not exists"}}
-            return Response(data=response_data, status=status.HTTP_200_OK)
+                    "error": "user does not exists",
+                    "message": "user does not exists"
+                }}
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteView(APIView):
@@ -263,8 +273,10 @@ class DeleteView(APIView):
             if not check_token_autorization.check_token_authorization(
                     user, request):
                 response_data = {'responseCode': 0,
-                                 'data': "This user cannot update this account"}
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                                 'data': "This user cannot update this account",
+                                 'message': "This user cannot update this account"
+                                 }
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
             if profile.is_active:
                 profile.is_active = False
@@ -278,13 +290,17 @@ class DeleteView(APIView):
             else:
                 response_data = {
                     'responseCode': 0, 'data': {
-                        "error": "This User does not exists anymore"}}
-                return Response(data=response_data, status=status.HTTP_200_OK)
+                        "error": "This User does not exists anymore",
+                        "message": "This User does not exists anymore"
+                    }}
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
         else:
             response_data = {
                 'responseCode': 0, 'data': {
-                    "error": "User does not exists"}}
-            return Response(data=response_data, status=status.HTTP_200_OK)
+                    "error": "User does not exists",
+                    "message": "User does not exists"
+            }}
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyUserView(APIView):
@@ -294,12 +310,16 @@ class VerifyUserView(APIView):
     def put(self, request):
         if "national_id" not in request.data and "passport" not in request.data:
             response_data = {'responseCode': 0,
-                             'data': "passport or national_id required"}
-            return Response(data=response_data, status=status.HTTP_200_OK)
+                             'data': "passport or national_id required",
+                             'message': "passport or national_id required"
+                             }
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         if not User.objects.filter(username=request.data['username']).exists():
-            response_data = {'responseCode': 0, 'data': "user does not exits"}
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            response_data = {'responseCode': 0, 'data': "user does not exits",
+                             'message': "user does not exits"
+                             }
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(username=request.data['username'])
         request.data.pop("username")
@@ -312,8 +332,8 @@ class VerifyUserView(APIView):
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_200_OK)
 
-        response_data = {'responseCode': 0, 'data': serialized.errors}
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        response_data = {'responseCode': 0, 'data': serialized.errors, 'message': 'Error occurred'}
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UpdateProfileImage(APIView):
@@ -339,7 +359,7 @@ class UpdateProfileImage(APIView):
             "responseCode": 0,
             "message": "User does not exists"
         }
-        return Response(data=response, status=status.HTTP_200_OK)
+        return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PaymentMethod(APIView):
@@ -358,9 +378,10 @@ class PaymentMethod(APIView):
 
         response = {
             "responseCode": 0,
-            "data": "no payment method added"
+            "data": "no payment method added",
+            "message": "no payment method added"
         }
-        return Response(data=response, status=status.HTTP_200_OK)
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         user_id = request.data['user']

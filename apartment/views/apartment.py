@@ -43,18 +43,20 @@ class ApartmentUpdateDeleteAPIView(APIView):
                 return Response(data=response_data, status=status.HTTP_200_OK)
             response_data = {
                 "statusCode": 0,
-                "data": serialized.errors
+                "data": serialized.errors,
+                'message': 'Error occurred'
             }
 
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
             response_data = {
                 "statusCode": 0,
-                "data": "apartment does not exists"
+                "data": "apartment does not exists",
+                "message": "apartment does not exists"
             }
 
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         _apartment_exists = Apartment.objects.filter(uuid=request.data['uuid'])
@@ -71,15 +73,17 @@ class ApartmentUpdateDeleteAPIView(APIView):
             response_data = {
                 "statusCode": 0,
                 "data": "apartment already deleted",
+                "message": "apartment already deleted",
             }
-            return Response(data=response_data, status=status.HTTP_200_OK)
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         response_data = {
             "statusCode": 0,
-            "data": "apartment does not exists"
+            "data": "apartment does not exists",
+            "message": "apartment does not exists"
         }
 
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ApartmentCreateAPIView(APIView):
@@ -103,10 +107,11 @@ class ApartmentCreateAPIView(APIView):
 
         response_data = {
             "statusCode": 0,
-            "data": serialized.errors
+            "data": serialized.errors,
+            'message': 'Error occurred'
         }
 
-        return Response(data=response_data, status=status.HTTP_200_OK)
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ApartmentListAPIView(ListAPIView):

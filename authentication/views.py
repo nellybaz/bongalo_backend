@@ -21,16 +21,14 @@ from datetime import datetime, timedelta
 import pytz
 
 
-
 def send_email(to, subject, message):
-    res = send_mail(
+    send_mail(
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
         [to],
         fail_silently=False,
     )
-    print(res)
 
 
 def send_sms(to, message):
@@ -46,14 +44,12 @@ def send_sms(to, message):
 
     url = 'http://api.pindo.io/v1/sms/'
     response = requests.post(url, json=data, headers=headers)
-    print(response)
-    print(response.json())
 
 
 class VerifyEmail(APIView):
     def post(self, request):
-        pin = request.data['pin']
-        email = request.data['email']
+        pin = request.data.get('pin')
+        email = request.data.get('email')
         try:
             user = UserProfile.objects.get(user__email=email)
             user_pin = PinVerify.objects.get(user=user)
@@ -89,12 +85,10 @@ class VerifyEmail(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        username = request.data['username']
-        password = request.data['password']
+        username = request.data.get('username')
+        password = request.data.get('password')
 
-        print("username is {} and password is {}".format(username, password))
         user = authenticate(username=username, password=password)
-        print(user)
         if user:
             # check if user is active
             profile = UserProfile.objects.get(user=user)
@@ -136,7 +130,7 @@ class UserRegisterViews(APIView):
         if serialized.is_valid():
             serialized.save()
             send_email(
-                request.data['email'],
+                request.data.get('email'),
                 "Bongalo Email Verification",
                 "Hi, \nYour pin verification is " +
                 verification_pin)
@@ -150,7 +144,7 @@ class UserRegisterViews(APIView):
 
 class SocialAuth(APIView):
     def post(self, request):
-        username = request.data['username']
+        username = request.data.get('username')
 
         if User.objects.filter(username=username).exists():
             user = User.objects.get(username=username)
@@ -222,9 +216,9 @@ class UserView(APIView):
         return Response(data=res, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
-        is_exists = UserProfile.objects.filter(uuid=request.data['user'])
+        is_exists = UserProfile.objects.filter(uuid=request.data.get('user'))
         if is_exists.exists():  # Update data if user exists
-            profile = UserProfile.objects.get(uuid=request.data['user'])
+            profile = UserProfile.objects.get(uuid=request.data.get('user'))
 
             # Check if user can update account
             if not check_token_autorization.check_token_authorization(
@@ -237,10 +231,10 @@ class UserView(APIView):
             self.check_object_permissions(request, profile)
 
             user = profile.user
-            profile.phone = request.data['phone']
-            profile.description = request.data['description']
-            user.first_name = request.data['first_name']
-            user.last_name = request.data['last_name']
+            profile.phone = request.data.get('phone')
+            profile.description = request.data.get('description')
+            user.first_name = request.data.get('first_name')
+            user.last_name = request.data.get('last_name')
 
             profile.save()
             user.save()
@@ -264,9 +258,9 @@ class DeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
-        is_exists = User.objects.filter(username=request.data['username'])
+        is_exists = User.objects.filter(username=request.data.get('username'))
         if is_exists.exists():
-            user = User.objects.get(username=request.data['username'])
+            user = User.objects.get(username=request.data.get('username'))
             profile = UserProfile.objects.get(user=user)
 
             # Check if user can update account
@@ -315,13 +309,13 @@ class VerifyUserView(APIView):
                              }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        if not User.objects.filter(username=request.data['username']).exists():
+        if not User.objects.filter(username=request.data.get('username')).exists():
             response_data = {'responseCode': 0, 'data': "user does not exits",
                              'message': "user does not exits"
                              }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(username=request.data['username'])
+        user = User.objects.get(username=request.data.get('username'))
         request.data.pop("username")
         serialized = VerifyUserSerializer(
             UserProfile.objects.get(
@@ -339,8 +333,8 @@ class VerifyUserView(APIView):
 class UpdateProfileImage(APIView):
 
     def post(self, request):
-        user_id = request.data['uuid']
-        image_url = request.data['image']
+        user_id = request.data.get('uuid')
+        image_url = request.data.get('image')
 
         if UserProfile.objects.filter(uuid=user_id).exists():
             profile = UserProfile.objects.get(uuid=user_id)
@@ -384,8 +378,8 @@ class PaymentMethod(APIView):
         return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        user_id = request.data['user']
-        number = request.data['momo_number']
+        user_id = request.data.get('user')
+        number = request.data.get('momo_number')
 
         user = UserProfile.objects.get(uuid=user_id)
         if PaymentMethodModel.objects.filter(user=user).exists():
@@ -416,14 +410,14 @@ class ResetPasswordView(APIView):
     Receive email address, and send an encrypted link of the user's uuid and email to the email address
     """
     def post(self, request):
-        user_email = request.data['email']
+        user_email = request.data.get('email')
         if not UserProfile.objects.filter(user__email=user_email, is_active=True).exists():
             response = {
                 "responseCode": 0,
                 "message": "User with this email does not exits"
             }
 
-            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
         user = UserProfile.objects.get(user__email=user_email, is_active=True)
         key = Fernet.generate_key()  # Generate the unique key to encrypt text with
@@ -433,7 +427,6 @@ class ResetPasswordView(APIView):
 
         #  Generate the reset link to be sent
         reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode()+"&email="+user_email
-        print(reset_password_link)
         send_email(
             user_email,
             "Password Reset",
@@ -451,7 +444,7 @@ class ResetPasswordView(APIView):
         return Response(data=response, status=status.HTTP_200_OK)
 
     def put(self, request):
-        user_email = request.data['email']
+        user_email = request.data.get('email')
         if not UserProfile.objects.filter(user__email=user_email, is_active=True).exists():
             response = {
                 "responseCode": 0,
@@ -461,7 +454,7 @@ class ResetPasswordView(APIView):
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         user = UserProfile.objects.get(user__email=user_email, is_active=True)
-        token = request.data['token'].encode()
+        token = request.data.get('token').encode()
 
         # If the link is already used
         if not PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by('created_at').exists():
@@ -487,7 +480,7 @@ class ResetPasswordView(APIView):
             return Response(data=response, status=status.HTTP_200_OK)
 
         if decrypted_message.decode() == "uuid={}&email={}".format(user.uuid, user.user.email):
-            user.user.set_password(request.data['password'])
+            user.user.set_password(request.data.get('password'))
             user.user.save()
 
             #  Update the password reset object to used

@@ -451,7 +451,7 @@ class ResetPasswordView(APIView):
                 "message": "User with this email does not exits"
             }
 
-            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
         user = UserProfile.objects.get(user__email=user_email, is_active=True)
         token = request.data.get('token').encode()

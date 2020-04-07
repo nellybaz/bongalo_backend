@@ -49,6 +49,10 @@ urlpatterns = [
         views.VerifyEmail.as_view(),
         name="verify_email"),
     path(
+        'verification-pin/resend',
+        views.ResendVerificationView.as_view(),
+        name="resend_verification_pin"),
+    path(
         'user/reset-password',
         views.ResetPasswordView.as_view(),
         name="reset_password"),

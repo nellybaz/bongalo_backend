@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -44,6 +45,34 @@ def send_sms(to, message):
 
     url = 'http://api.pindo.io/v1/sms/'
     response = requests.post(url, json=data, headers=headers)
+
+
+class ResendVerificationView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        if UserProfile.objects.filter(user__email=email).exists():
+            verification_pin = ''.join(random.sample('0123456789', 5))
+            user = UserProfile.objects.get(user__email=email)
+            user_verify_object = PinVerify.objects.get(user=user)
+            user_verify_object.pin = verification_pin
+            user_verify_object.save()
+            send_email(
+                request.data.get('email'),
+                "Bongalo Email Verification",
+                "Hi, \nYour pin verification is " +
+                verification_pin)
+
+            response = {
+                'responseCode': 1,
+                'message': 'Verification pin resent to email',
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+
+        response = {
+            'responseCode': 0,
+            'message': 'Email address not registered. Try registering again',
+        }
+        return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
 
 class VerifyEmail(APIView):

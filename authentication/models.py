@@ -13,6 +13,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=225, blank=True, )
     description = models.CharField(max_length=225, default="")
+    resident_city = models.CharField(max_length=225, blank=True, )
     resident_country = models.CharField(max_length=225, blank=True, )
     origin_country = models.CharField(max_length=225, blank=True, )
     phone = models.CharField(max_length=225, blank=True, )

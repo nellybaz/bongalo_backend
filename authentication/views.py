@@ -75,6 +75,11 @@ class ResendVerificationView(APIView):
         return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
 
+class UserReviewView(APIView):
+    def get(self, request):
+        pass
+
+
 class VerifyEmail(APIView):
     def post(self, request):
         pin = request.data.get('pin')
@@ -259,9 +264,13 @@ class UserView(APIView):
                 return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
             self.check_object_permissions(request, profile)
 
+            country = request.data.get("country")
+            city = request.data.get("city")
             user = profile.user
             profile.phone = request.data.get('phone')
             profile.description = request.data.get('description')
+            profile.resident_city = city if city else ""
+            profile.resident_country = country if country else ""
             user.first_name = request.data.get('first_name')
             user.last_name = request.data.get('last_name')
 

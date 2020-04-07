@@ -64,6 +64,10 @@ urlpatterns = [
         'user/review/all',
         views.UserReviewView.as_view(),
         name="get_user_review"),
+    path(
+        'user/password/change',
+        views.PasswordChangeView.as_view(),
+        name="user_password_change"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

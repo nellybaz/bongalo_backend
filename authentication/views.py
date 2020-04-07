@@ -47,6 +47,31 @@ def send_sms(to, message):
     response = requests.post(url, json=data, headers=headers)
 
 
+# Password change for logged in users
+class PasswordChangeView(APIView):
+    def put(self, request):
+        if not UserProfile.objects.filter(uuid=request.data.get('user'), is_active=True).exists():
+            response = {
+                'message': 'User does not exists'
+            }
+            return Response(data=response, status=status.HTTP_404_NOT_FOUND)
+
+        user = UserProfile.objects.get(uuid=request.data.get('user'), is_active=True)
+        new_password = request.data.get('password')
+        if not new_password:
+            response = {
+                'message': 'Password is needed'
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        user.user.set_password(new_password)
+        user.user.save()
+        response = {
+            'message': 'Password has has been changed successfully'
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
+
+
 class ResendVerificationView(APIView):
     def post(self, request):
         email = request.data.get('email')

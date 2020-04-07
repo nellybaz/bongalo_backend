@@ -1,5 +1,6 @@
 import random
 import requests
+import threading
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -45,6 +46,63 @@ def send_sms(to, message):
 
     url = 'http://api.pindo.io/v1/sms/'
     response = requests.post(url, json=data, headers=headers)
+
+
+class SendEmailThread(threading.Thread):
+    message = None
+    recipient = None
+    subject = None
+
+    def __init__(self, recipient, subject, message):
+        threading.Thread.__init__(self)
+        self.recipient = recipient
+        self.subject = subject
+        self.message = message
+
+    def run(self):
+        send_email(self.recipient, self.subject, self.message)
+
+
+class UserVerifyView(APIView):
+    def post(self, request):
+        if not UserProfile.objects.filter(uuid=request.data.get('user'), is_active=True).exists():
+            response = {
+                'message': 'User does not exists'
+            }
+            return Response(data=response, status=status.HTTP_404_NOT_FOUND)
+
+        user = UserProfile.objects.get(uuid=request.data.get('user'), is_active=True)
+        verification_image = request.data.get('verification_image')
+        if not verification_image:
+            response = {
+                'message': 'Verification image is needed'
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.data.get('is_passport') is None:
+            response = {
+                'message': 'is_passport field is required'
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.data.get('is_passport'):
+            user.passport = verification_image
+        else:
+            user.national_id = verification_image
+
+        user.save()
+
+        email_message = "Hi \nA user with name {} {} has requested to verify his account".format(user.user.first_name,
+                                                                                                 user.user.last_name)
+        email_thread = SendEmailThread("nellybaz10@gmail.com", "User verification Request", email_message)
+
+        # Spawn a new thread to run sending email to admin, to reduce the response time for the users
+        email_thread.run()
+
+        response = {
+            'message': 'Verification has been sent successfully'
+        }
+        return Response(data=response, status=status.HTTP_200_OK)
 
 
 # Password change for logged in users
@@ -212,7 +270,7 @@ class LoginView(APIView):
                 response_data = {
                     'responseCode': 0,
                     'data': "user account is not active"
-                    'message' "user account is not active"
+                            'message' "user account is not active"
                 }
                 return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
@@ -400,7 +458,7 @@ class DeleteView(APIView):
                 'responseCode': 0, 'data': {
                     "error": "User does not exists",
                     "message": "User does not exists"
-            }}
+                }}
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -502,7 +560,7 @@ class PaymentMethod(APIView):
             "Hi {0} \nYour mobile number for receiving "
             "payments on Bongalo has been changed. If this "
             "action was performed by you pls call 0784650455 to "
-            "cancel immediately" .format(
+            "cancel immediately".format(
                 user.user.first_name))
 
         response = {
@@ -516,6 +574,7 @@ class ResetPasswordView(APIView):
     """
     Receive email address, and send an encrypted link of the user's uuid and email to the email address
     """
+
     def post(self, request):
         user_email = request.data.get('email')
         if not UserProfile.objects.filter(user__email=user_email, is_active=True).exists():
@@ -533,7 +592,7 @@ class ResetPasswordView(APIView):
         encrypted_message = f_encrypt.encrypt(message_to_encrypt)  # Encrypt the message
 
         #  Generate the reset link to be sent
-        reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode()+"&email="+user_email
+        reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode() + "&email=" + user_email
         send_email(
             user_email,
             "Password Reset",
@@ -564,14 +623,16 @@ class ResetPasswordView(APIView):
         token = request.data.get('token').encode()
 
         # If the link is already used
-        if not PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by('created_at').exists():
+        if not PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by(
+                'created_at').exists():
             response = {
                 'responseCode': 0,
                 'message': 'Link invalid, please request to reset password again'
             }
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
-        password_reset_object = PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by('created_at').first()
+        password_reset_object = PasswordReset.objects.filter(user__user__email=user_email, is_used=False).order_by(
+            'created_at').first()
 
         reset_key = password_reset_object.reset_key
         f_encrypt = Fernet(reset_key.encode())  # Initialize the encrypt object

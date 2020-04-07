@@ -68,6 +68,10 @@ urlpatterns = [
         'user/password/change',
         views.PasswordChangeView.as_view(),
         name="user_password_change"),
+    path(
+        'user/verification/submit',
+        views.UserVerifyView.as_view(),
+        name="user_verification"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

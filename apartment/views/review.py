@@ -9,11 +9,11 @@ from django.contrib.auth.models import User
 
 
 class ReviewListUpdateCreate(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        query_param = self.request.query_params.get("apartment") or None
+        query_param = self.request.query_params.get("apartment")
 
         # Check error in query params
         if not query_param:

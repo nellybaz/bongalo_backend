@@ -1,6 +1,5 @@
 import random
 import requests
-import threading
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -12,7 +11,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from utils.email_thread import SendEmailThread
 from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
 from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify, PasswordReset
@@ -46,21 +45,6 @@ def send_sms(to, message):
 
     url = 'http://api.pindo.io/v1/sms/'
     response = requests.post(url, json=data, headers=headers)
-
-
-class SendEmailThread(threading.Thread):
-    message = None
-    recipient = None
-    subject = None
-
-    def __init__(self, recipient, subject, message):
-        threading.Thread.__init__(self)
-        self.recipient = recipient
-        self.subject = subject
-        self.message = message
-
-    def run(self):
-        send_email(self.recipient, self.subject, self.message)
 
 
 class UserVerifyView(APIView):
@@ -124,6 +108,12 @@ class PasswordChangeView(APIView):
 
         user.user.set_password(new_password)
         user.user.save()
+
+        email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
+        email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
+
+        email_thread.run()
+
         response = {
             'message': 'Password has has been changed successfully'
         }

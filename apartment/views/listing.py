@@ -41,7 +41,8 @@ class ListingView(APIView):
                 apartment.save()
                 response = {
                     "responseCode": 1,
-                    "data": "apartment deleted"
+                    "data": "apartment deleted",
+                    "message": "Apartment deleted successfully"
                 }
                 return Response(data=response, status=status.HTTP_200_OK)
 

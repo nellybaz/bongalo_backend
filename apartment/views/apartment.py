@@ -8,6 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 import datetime as dt
+from utils.email_thread import SendEmailThread
 
 
 # TODO: Implement number of views for an apartment
@@ -99,9 +100,18 @@ class ApartmentCreateAPIView(APIView):
                 "request": "post"})
         if serialized.is_valid():
             serialized.save()
+
+            email_message = "Hi \nYou have successfully listed your house for rent, sit back and relax while we do " \
+                            "the rest "
+            email_thread = SendEmailThread(request.data.get('user'), "Apartment Listing Alert", email_message)
+
+            # Spawn a new thread to run sending email, to reduce the response time for the users
+            email_thread.run()
+
             response_data = {
                 "statusCode": 1,
                 "data": serialized.data,
+                "message": "Apartment created successfully"
             }
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 

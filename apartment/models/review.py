@@ -1,7 +1,7 @@
 from django.db import models
 from uuid import uuid4
 from .apartment import Apartment
-from django.contrib.auth.models import User
+from authentication.models import UserProfile
 
 
 class Review(models.Model):
@@ -14,7 +14,7 @@ class Review(models.Model):
         blank=False,
         default=uuid4,
         primary_key=True)
-    given_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    given_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE)
     review = models.TextField(blank=False)
     is_active = models.BooleanField(default=True)

@@ -15,11 +15,11 @@ from rest_framework.views import APIView
 from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
 from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify, PasswordReset
+from apartment.models import Review, Apartment
+from apartment.serializers import ReviewSerializer
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
 from bongalo_backend.settings import PINDO_API_TOKEN
 from cryptography.fernet import Fernet
-from datetime import datetime, timedelta
-import pytz
 
 
 def send_email(to, subject, message):
@@ -76,8 +76,52 @@ class ResendVerificationView(APIView):
 
 
 class UserReviewView(APIView):
+    def post(self, request):
+        data = {
+            'given_by': request.data.get('user'),
+            'apartment': request.data.get('apartment'),
+            'review': request.data.get('review'),
+        }
+
+        serialized = ReviewSerializer(data=data)
+        if serialized.is_valid():
+            serialized.save()
+
+            response = {
+                'responseCode': 1,
+                'message': 'apartment review given',
+                'data': serialized.data,
+            }
+
+            return Response(data=response, status=status.HTTP_201_CREATED)
+
+        response = {
+            'responseCode': 0,
+            'data': serialized.errors,
+            'message': 'error occurred saving review'
+        }
+
+        return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def get(self, request):
-        pass
+        if not UserProfile.objects.filter(uuid=self.request.query_params.get('user'), is_active=True).exists():
+            response = {
+                'responseCode': 0,
+                'message': 'user does not exists'
+            }
+
+            return Response(data=response, status=status.HTTP_404_NOT_FOUND)
+
+        user = UserProfile.objects.get(uuid=self.request.query_params.get('user'), is_active=True)
+        all_reviews_by_user = Review.objects.filter(given_by=user)
+        serialized = ReviewSerializer(all_reviews_by_user, many=True)
+
+        response = {
+            'data': serialized.data,
+            'message': 'all user reviews retrieved'
+        }
+
+        return Response(data=response, status=status.HTTP_200_OK)
 
 
 class VerifyEmail(APIView):

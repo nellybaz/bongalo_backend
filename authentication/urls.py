@@ -56,6 +56,14 @@ urlpatterns = [
         'user/reset-password',
         views.ResetPasswordView.as_view(),
         name="reset_password"),
+    path(
+        'user/review/make',
+        views.UserReviewView.as_view(),
+        name="user_make_review"),
+    path(
+        'user/review/all',
+        views.UserReviewView.as_view(),
+        name="get_user_review"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

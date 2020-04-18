@@ -23,6 +23,7 @@ from cryptography.fernet import Fernet
 
 
 def send_email(to, subject, message):
+    print(settings.DEFAULT_FROM_EMAIL)
     send_mail(
         subject,
         message,

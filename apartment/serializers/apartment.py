@@ -20,6 +20,7 @@ class ApartmentSerializer(serializers.Serializer):
     available_rooms = serializers.IntegerField()
     max_guest_number = serializers.IntegerField()
     country = serializers.CharField()
+    city = serializers.CharField()
     number_of_bathrooms = serializers.IntegerField()
     price = serializers.IntegerField()
     discount = serializers.FloatField()

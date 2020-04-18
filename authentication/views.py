@@ -583,6 +583,7 @@ class ResetPasswordView(APIView):
 
         #  Generate the reset link to be sent
         reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode() + "&email=" + user_email
+        print(reset_password_link)
         send_email(
             user_email,
             "Password Reset",
@@ -628,7 +629,6 @@ class ResetPasswordView(APIView):
         f_encrypt = Fernet(reset_key.encode())  # Initialize the encrypt object
         try:
             decrypted_message = f_encrypt.decrypt(token)
-
         except BaseException:
             response = {
                 'responseCode': 0,

@@ -20,11 +20,7 @@ from utils.email_thread import SendEmailThread
 # TODO:
 # TODO:
 
-
-class ApartmentUpdateDeleteAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOnly]
-    authentication_classes = [TokenAuthentication]
-
+class ApartmentDetailsView(APIView):
     def get(self, request):
         apartment_uuid = self.request.query_params.get('uuid')
         apartment_exists = Apartment.objects.filter(uuid=apartment_uuid, is_active=True)
@@ -56,6 +52,11 @@ class ApartmentUpdateDeleteAPIView(APIView):
             }
 
             return Response(data=response_data, status=status.HTTP_404_NOT_FOUND)
+
+
+class ApartmentUpdateDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOnly]
+    authentication_classes = [TokenAuthentication]
 
     def put(self, request):
         apartment_uuid = request.data.pop('uuid')

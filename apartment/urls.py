@@ -17,6 +17,10 @@ urlpatterns = [
         views.ApartmentUpdateDeleteAPIView.as_view(),
         name="delete_apartment"),
     path(
+        'get',
+        views.ApartmentUpdateDeleteAPIView.as_view(),
+        name="get_apartment_details"),
+    path(
         'all',
         views.ApartmentListAPIView.as_view(),
         name="all_apartments"),

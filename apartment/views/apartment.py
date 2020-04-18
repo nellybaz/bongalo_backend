@@ -25,6 +25,38 @@ class ApartmentUpdateDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOnly]
     authentication_classes = [TokenAuthentication]
 
+    def get(self, request):
+        apartment_uuid = self.request.query_params.get('uuid')
+        apartment_exists = Apartment.objects.filter(uuid=apartment_uuid, is_active=True)
+        if apartment_exists.exists():
+            apartment = Apartment.objects.get(uuid=apartment_uuid, is_active=True)
+            serialized = ApartmentSerializer(
+                apartment)
+            if serialized:
+                response_data = {
+                    "statusCode": 1,
+                    "data": serialized.data,
+                    "message": "ok"
+                }
+
+                return Response(data=response_data, status=status.HTTP_200_OK)
+            response_data = {
+                "statusCode": 0,
+                "data": serialized.errors,
+                'message': 'Error occurred'
+            }
+
+            return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        else:
+            response_data = {
+                "statusCode": 0,
+                "data": "apartment does not exists",
+                "message": "apartment does not exists"
+            }
+
+            return Response(data=response_data, status=status.HTTP_404_NOT_FOUND)
+
     def put(self, request):
         apartment_uuid = request.data.pop('uuid')
         # TODO:  what happens when when I am not an owner

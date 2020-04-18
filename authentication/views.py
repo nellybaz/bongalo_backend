@@ -240,6 +240,14 @@ class LoginView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
 
+        if not UserProfile.objects.filter(user__email=username).exists():
+            response_data = {
+                             'responseCode': 0,
+                             'data': "login failed",
+                             "message": "Email address not found. Please register"
+                            }
+            return Response(data=response_data, status=status.HTTP_404_NOT_FOUND)
+
         user = authenticate(username=username, password=password)
         if user:
             # check if user is active

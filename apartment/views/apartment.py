@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import datetime as dt
 from utils.email_thread import SendEmailThread
+from authentication.serializers import UserProfileSerializer
 
 
 # TODO: Implement number of views for an apartment
@@ -26,12 +27,13 @@ class ApartmentDetailsView(APIView):
         apartment_exists = Apartment.objects.filter(uuid=apartment_uuid, is_active=True)
         if apartment_exists.exists():
             apartment = Apartment.objects.get(uuid=apartment_uuid, is_active=True)
+            owner_details_serialized = UserProfileSerializer(apartment.owner)
             serialized = ApartmentSerializer(
                 apartment)
-            if serialized:
+            if serialized and owner_details_serialized:
                 response_data = {
                     "statusCode": 1,
-                    "data": serialized.data,
+                    "data": {**serialized.data, "owner_details": {**owner_details_serialized.data}},
                     "message": "ok"
                 }
 

@@ -157,3 +157,9 @@ class VerifyUserSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         pass
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'

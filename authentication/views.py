@@ -123,10 +123,10 @@ class PasswordChangeView(APIView):
         user.user.set_password(new_password)
         user.user.save()
 
-        # email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
-        # email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
+        email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
+        email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
 
-        # email_thread.run()
+        email_thread.run()
 
         response = {
             "responseCode":1,

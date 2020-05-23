@@ -20,6 +20,7 @@ from apartment.serializers import ReviewSerializer
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
 from bongalo_backend.settings import PINDO_API_TOKEN
 from cryptography.fernet import Fernet
+from utils.email_thread import SendEmailThread
 
 
 def send_email(to, subject, message):
@@ -92,14 +93,17 @@ class UserVerifyView(APIView):
 
 # Password change for logged in users
 class PasswordChangeView(APIView):
+    permission_classes = [IsOwnerOnly, IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
     def put(self, request):
-        if not UserProfile.objects.filter(uuid=request.data.get('user'), is_active=True).exists():
+        if not UserProfile.objects.filter(user=request.user, is_active=True).exists():
             response = {
                 'message': 'User does not exists'
             }
             return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
-        user = UserProfile.objects.get(uuid=request.data.get('user'), is_active=True)
+        user = UserProfile.objects.get(user=request.user, is_active=True)
         new_password = request.data.get('password')
         if not new_password:
             response = {
@@ -110,13 +114,14 @@ class PasswordChangeView(APIView):
         user.user.set_password(new_password)
         user.user.save()
 
-        email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
-        email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
+        # email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
+        # email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
 
-        email_thread.run()
+        # email_thread.run()
 
         response = {
-            'message': 'Password has has been changed successfully'
+            "responseCode":1,
+            'message': 'Password has been changed successfully'
         }
         return Response(data=response, status=status.HTTP_200_OK)
 
@@ -287,13 +292,25 @@ class UserRegisterViews(APIView):
                 "request": "post",
                 "pin_code": verification_pin},
             partial=True)
+        try:
+            # send_email(
+            # request.data.get('email'),
+            # "Bongalo Email Verification",
+            # "Hi, \nYour pin verification is " +
+            # verification_pin)
+
+            email_message = "Hi, \nYour pin verification is " +verification_pin
+
+            email_thread = SendEmailThread(request.data.get('email'), "Bongalo Email Verification", email_message)
+
+            # Spawn a new thread to run sending email, to reduce the response time for the users
+            email_thread.run()
+        except BaseException:
+            response_data = {'responseCode': 0, 'data': [], 'message': 'Could not send registration token please try again'}
+            return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         if serialized.is_valid():
             serialized.save()
-            send_email(
-                request.data.get('email'),
-                "Bongalo Email Verification",
-                "Hi, \nYour pin verification is " +
-                verification_pin)
 
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)
@@ -362,7 +379,10 @@ class UserView(APIView):
                     "profile_image": user.profile_image,
                     "phone_number": user.phone,
                     "description": user.description,
+                    "city":user.resident_city,
+                    "country":user.resident_country,
                     "token": Token.objects.get(user=user.user).key,
+                    "verification_status":user.verification_status,
 
                 }
             }
@@ -473,14 +493,14 @@ class VerifyUserView(APIView):
                              }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        if not User.objects.filter(username=request.data.get('username')).exists():
+        print(request.user)
+        if not request.user:
             response_data = {'responseCode': 0, 'data': "user does not exits",
                              'message': "user does not exits"
                              }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(username=request.data.get('username'))
-        request.data.pop("username")
+        user = request.user
         serialized = VerifyUserSerializer(
             UserProfile.objects.get(
                 user=user), data=request.data, context={

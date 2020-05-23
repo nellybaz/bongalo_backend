@@ -25,6 +25,7 @@ class UserProfile(models.Model):
     is_admin = models.BooleanField(blank=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now_add=True)
+    verification_status =  models.CharField(max_length=1, default="U")
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name
@@ -38,6 +39,10 @@ class PaymentMethod(models.Model):
         max_length=100)
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     momo_number = models.CharField(max_length=20)
+    bank_name = models.CharField(max_length=50)
+    account_name = models.CharField(max_length=50)
+    account_number = models.CharField(max_length=50)
+    swift_code = models.CharField(max_length=20, )
     created_at = models.DateTimeField(auto_now_add=True)
 
 

@@ -150,6 +150,7 @@ class VerifyUserSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.national_id = validated_data['national_id']
         instance.passport = validated_data['passport']
+        instance.verification_status = "P"
 
         instance.save()
 

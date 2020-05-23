@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserProfile, PinVerify
+from .models import UserProfile, PinVerify, PaymentMethod
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
@@ -163,4 +163,10 @@ class VerifyUserSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
+        fields = '__all__'
+
+
+class UserPaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
         fields = '__all__'

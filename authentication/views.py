@@ -105,11 +105,20 @@ class PasswordChangeView(APIView):
 
         user = UserProfile.objects.get(user=request.user, is_active=True)
         new_password = request.data.get('password')
+        old_password =  request.data.get('old_password')
         if not new_password:
             response = {
+                "reponseCode":0,
                 'message': 'Password is needed'
             }
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        # if not user.user.check_password(old_password):
+        #     response = {
+        #         "reponseCode":0,
+        #         'message': 'Wrong old password'
+        #     }
+        #     return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         user.user.set_password(new_password)
         user.user.save()
@@ -369,9 +378,11 @@ class UserView(APIView):
         user_id = self.request.query_params.get('user')
         if UserProfile.objects.filter(uuid=user_id, is_active=True).exists():
             user = UserProfile.objects.get(uuid=user_id)
-            res = {
-                'responseCode': 1,
-                'data': {
+            payment_details = None
+            if PaymentMethodModel.objects.filter(user=user).exists():
+                payment_details = PaymentMethodModel.objects.get(user=user) 
+
+            data = {
                     "uuid": user.uuid,
                     "first_name": user.user.first_name,
                     "last_name": user.user.last_name,
@@ -383,8 +394,18 @@ class UserView(APIView):
                     "country":user.resident_country,
                     "token": Token.objects.get(user=user.user).key,
                     "verification_status":user.verification_status,
-
+                    "bank_name": payment_details.bank_name if payment_details else "",
+                    "account_name": payment_details.account_name if payment_details else "",
+                    "account_number": payment_details.account_number if payment_details else "",
+                    "swift_code": payment_details.swift_code if payment_details else "",
+                    "momo_number": payment_details.momo_number if payment_details else "",
+                    "momo_name": payment_details.momo_name if payment_details else "",
                 }
+
+
+            res = {
+                'responseCode': 1,
+                'data': data
             }
             return Response(data=res, status=status.HTTP_200_OK)
 
@@ -541,6 +562,8 @@ class UpdateProfileImage(APIView):
 
 
 class PaymentMethod(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user_id = self.request.query_params.get('user')
@@ -562,25 +585,43 @@ class PaymentMethod(APIView):
         return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        user_id = request.data.get('user')
-        number = request.data.get('momo_number')
+        payment_data = {
+            'momo_number':request.data.get('momo_number'),
+            'momo_name': request.data.get('momo_name'),
+            'bank_name': request.data.get('bank_name'),
+            'account_name': request.data.get('account_name'),
+            'account_number': request.data.get('account_number'),
+            'swift_code': request.data.get('swift_code'),
+        }
 
-        user = UserProfile.objects.get(uuid=user_id)
+        if not request.user:
+            response = {
+            "responseCode": 0,
+            "data": "User does not exist"
+        }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserProfile.objects.get(user=request.user)
         if PaymentMethodModel.objects.filter(user=user).exists():
             payment_method = PaymentMethodModel.objects.get(user=user)
-            payment_method.momo_number = number
+            payment_method.momo_number = payment_data['momo_number']
+            payment_method.momo_name = payment_data['momo_name']
+            payment_method.bank_name = payment_data['bank_name']
+            payment_method.account_name = payment_data['account_name']
+            payment_method.account_number = payment_data['account_number']
+            payment_method.swift_code = payment_data['swift_code']
             payment_method.save()
 
         else:
-            PaymentMethodModel.objects.create(user=user, momo_number=number)
-        send_email(
-            user.user.email,
-            "Bongalo Payment Info Update",
-            "Hi {0} \nYour mobile number for receiving "
-            "payments on Bongalo has been changed. If this "
-            "action was performed by you pls call 0784650455 to "
-            "cancel immediately".format(
-                user.user.first_name))
+            PaymentMethodModel.objects.create(user=user, **payment_data)
+            # send_email(
+            #     user.user.email,
+            #     "Bongalo Payment Info Update",
+            #     "Hi {0} \nYour mobile number for receiving "
+            #     "payments on Bongalo has been changed. If this "
+            #     "action was performed by you pls call 0784650455 to "
+            #     "cancel immediately".format(
+            #         user.user.first_name))
 
         response = {
             "responseCode": 1,

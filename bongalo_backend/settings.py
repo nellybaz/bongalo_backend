@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 8,
+    'PAGE_SIZE': 12,
     # 'EXCEPTION_HANDLER': 'bongalo_backend.authentication.utils.custom_exception_handler.'
 }
 

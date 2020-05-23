@@ -38,11 +38,12 @@ class PaymentMethod(models.Model):
         default=uuid4,
         max_length=100)
     user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    momo_number = models.CharField(max_length=20)
-    bank_name = models.CharField(max_length=50)
-    account_name = models.CharField(max_length=50)
-    account_number = models.CharField(max_length=50)
-    swift_code = models.CharField(max_length=20, )
+    momo_number = models.CharField(max_length=20, default="")
+    momo_name = models.CharField(max_length=20, default="")
+    bank_name = models.CharField(max_length=50, default="")
+    account_name = models.CharField(max_length=50, default="")
+    account_number = models.CharField(max_length=50, default="")
+    swift_code = models.CharField(max_length=20, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
 

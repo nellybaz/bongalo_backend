@@ -72,6 +72,10 @@ urlpatterns = [
         'user/verification/submit',
         views.UserVerifyView.as_view(),
         name="user_verification"),
+    # path(
+    #     'user/payout/update',
+    #     views.UserPayoutView.as_view(),
+    #     name="user_update_payout"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

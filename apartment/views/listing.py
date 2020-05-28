@@ -60,20 +60,29 @@ class ListingView(APIView):
         }
         return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request):
-        user_id = request.data['user']
-        apartment_id = request.data['apartment']
-        if UserProfile.objects.filter(uuid=user_id).exits():
+    def put(self, request):
+        print("update put called")
+        user_id = request.data.get('owner')
+        apartment_id = request.data.get('apartment')
+        if UserProfile.objects.filter(uuid=user_id).exists():
             user = UserProfile.objects.get(uuid=user_id)
             apartment = Apartment.objects.get(uuid=apartment_id)
             if apartment.owner == user:
                 serialized = ApartmentSerializer(apartment, data=request.data)
-                if serialized:
+                print("serializers reached above")
+                if serialized.is_valid():
+                    serialized.save()
                     response = {
                         "responseCode": 1,
                         "data": serialized.data
                     }
-                return Response(data=response, status=status.HTTP_200_OK)
+                    return Response(data=response, status=status.HTTP_200_OK)
+                response = {
+                    "responseCode": 0,
+                    "data": serialized.errors,
+                    "message": "Bad Update data"
+                }
+                return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
             response = {
                 "responseCode": 0,

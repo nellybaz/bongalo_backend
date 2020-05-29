@@ -32,14 +32,14 @@ class ApartmentDetailsView(APIView):
                 apartment)
             if serialized and owner_details_serialized:
                 response_data = {
-                    "statusCode": 1,
+                    "responseCode": 1,
                     "data": {**serialized.data, "owner_details": {**owner_details_serialized.data}},
                     "message": "ok"
                 }
 
                 return Response(data=response_data, status=status.HTTP_200_OK)
             response_data = {
-                "statusCode": 0,
+                "responseCode": 0,
                 "data": serialized.errors,
                 'message': 'Error occurred'
             }
@@ -48,7 +48,7 @@ class ApartmentDetailsView(APIView):
 
         else:
             response_data = {
-                "statusCode": 0,
+                "responseCode": 0,
                 "data": "apartment does not exists",
                 "message": "apartment does not exists"
             }
@@ -72,13 +72,13 @@ class ApartmentUpdateDeleteAPIView(APIView):
             if serialized.is_valid():
                 serialized.save()
                 response_data = {
-                    "statusCode": 1,
+                    "responseCode": 1,
                     "data": serialized.data
                 }
 
                 return Response(data=response_data, status=status.HTTP_200_OK)
             response_data = {
-                "statusCode": 0,
+                "responseCode": 0,
                 "data": serialized.errors,
                 'message': 'Error occurred'
             }
@@ -87,7 +87,7 @@ class ApartmentUpdateDeleteAPIView(APIView):
 
         else:
             response_data = {
-                "statusCode": 0,
+                "responseCode": 0,
                 "data": "apartment does not exists",
                 "message": "apartment does not exists"
             }
@@ -102,19 +102,19 @@ class ApartmentUpdateDeleteAPIView(APIView):
                 apartment.is_active = False
                 apartment.save()
                 response_data = {
-                    "statusCode": 1,
+                    "responseCode": 1,
                     "data": "apartment deleted successfully",
                 }
                 return Response(data=response_data, status=status.HTTP_200_OK)
             response_data = {
-                "statusCode": 0,
+                "responseCode": 0,
                 "data": "apartment already deleted",
                 "message": "apartment already deleted",
             }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
         response_data = {
-            "statusCode": 0,
+            "responseCode": 0,
             "data": "apartment does not exists",
             "message": "apartment does not exists"
         }
@@ -136,22 +136,25 @@ class ApartmentCreateAPIView(APIView):
         if serialized.is_valid():
             serialized.save()
 
-            email_message = "Hi \nYou have successfully listed your house for rent, sit back and relax while we do " \
-                            "the rest "
-            email_thread = SendEmailThread(request.data.get('user'), "Apartment Listing Alert", email_message)
+            try:
+                email_message = "Hi \nYou have successfully listed your house for rent, sit back and relax while we do " \
+                                "the rest "
+                email_thread = SendEmailThread(request.user.email, "Apartment Listing Alert", email_message)
 
-            # Spawn a new thread to run sending email, to reduce the response time for the users
-            email_thread.run()
+                # Spawn a new thread to run sending email, to reduce the response time for the users
+                email_thread.run()
+            except:
+                pass
 
             response_data = {
-                "statusCode": 1,
+                "responseCode": 1,
                 "data": serialized.data,
                 "message": "Apartment created successfully"
             }
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
         response_data = {
-            "statusCode": 0,
+            "responseCode": 0,
             "data": serialized.errors,
             'message': 'Error occurred'
         }

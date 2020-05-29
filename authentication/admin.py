@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, PaymentMethod, PinVerify, PasswordReset
+from .models import UserProfile, PaymentMethod, PinVerify, PasswordReset, UserSubscribe
 
 
 class ProfileAdmin(admin.ModelAdmin):
@@ -24,3 +24,4 @@ admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(PaymentMethod)
 admin.site.register(PinVerify)
 admin.site.register(PasswordReset)
+admin.site.register(UserSubscribe)

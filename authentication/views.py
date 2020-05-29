@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from utils.email_thread import SendEmailThread
 from authentication.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from utils import check_token_autorization
-from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify, PasswordReset
+from .models import UserProfile, PaymentMethod as PaymentMethodModel, PinVerify, PasswordReset, UserSubscribe as UserSubscribeModel
 from apartment.models import Review, Apartment
 from apartment.serializers import ReviewSerializer
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
@@ -282,8 +282,8 @@ class LoginView(APIView):
             else:
                 response_data = {
                     'responseCode': 0,
-                    'data': "user account is not active"
-                            'message' "user account is not active"
+                    'data': "user account is not active",
+                    'message': "user account is not active"
                 }
                 return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
@@ -295,6 +295,11 @@ class UserRegisterViews(APIView):
     def post(self, request):  # Handle user registration
         verification_pin = ''.join(random.sample('0123456789', 5))
 
+        if UserProfile.objects.filter(user__email=request.data.get("email")).exists():
+            response_data = {'responseCode': 0, 'data': [],
+                             'message': 'Email address already registered. Please login'}
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
+
         serialized = UserRegisterSerializer(
             data=request.data,
             context={
@@ -302,12 +307,6 @@ class UserRegisterViews(APIView):
                 "pin_code": verification_pin},
             partial=True)
         try:
-            # send_email(
-            # request.data.get('email'),
-            # "Bongalo Email Verification",
-            # "Hi, \nYour pin verification is " +
-            # verification_pin)
-
             email_message = "Hi, \nYour pin verification is " +verification_pin
 
             email_thread = SendEmailThread(request.data.get('email'), "Bongalo Email Verification", email_message)
@@ -363,6 +362,17 @@ class SocialAuth(APIView):
                 "request": "post"}, partial=True)
         if serialized.is_valid():
             serialized.save()
+
+            try:
+                email_message = "Hi, \nThank you for signing up on Bongalo, You are the best"
+
+                email_thread = SendEmailThread(request.data.get('email'), "Bongalo Registration", email_message)
+
+                # Spawn a new thread to run sending email, to reduce the response time for the users
+                email_thread.run()
+            except BaseException:
+                pass
+
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
@@ -727,3 +737,31 @@ class ResetPasswordView(APIView):
             'message': 'Password reset failed'
         }
         return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserSubscribe(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            response = {
+                "responseCode": 0,
+                "message": "Email is required",
+                "data": "",
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        if UserSubscribeModel.objects.filter(email=email).exists():
+            response = {
+                "responseCode": 0,
+                "message": "Email already subscribed. But thanks for subscribing",
+                "data": "",
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
+
+        UserSubscribeModel.objects.create(email=email)
+        response = {
+            "responseCode": 1,
+            "message": "Thanks for subscribing",
+            "data": "",
+        }
+        return Response(data=response, status=status.HTTP_200_OK)

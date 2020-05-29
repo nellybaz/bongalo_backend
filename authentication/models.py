@@ -67,3 +67,12 @@ class PasswordReset(models.Model):
     reset_key = models.CharField(max_length=225)
     is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UserSubscribe(models.Model):
+    uuid = models.CharField(
+        primary_key=True,
+        unique=True,
+        default=uuid4,
+        max_length=100)
+    email = models.EmailField(max_length=225, default="")

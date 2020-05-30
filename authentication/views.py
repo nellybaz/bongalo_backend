@@ -663,11 +663,20 @@ class ResetPasswordView(APIView):
 
         #  Generate the reset link to be sent
         reset_password_link = "http://localhost:8080/reset-password?token=" + encrypted_message.decode() + "&email=" + user_email
-        print(reset_password_link)
-        send_email(
-            user_email,
-            "Password Reset",
-            "Hi {} \nFollow this link {} to reset your password".format(user.user.first_name, reset_password_link))
+        try:
+            email_message = "Hi {} \nFollow this link {} to reset your password".format(user.user.first_name, reset_password_link)
+
+            email_thread = SendEmailThread(user_email, "Bongalo Password Reset", email_message)
+
+            # Spawn a new thread to run sending email, to reduce the response time for the users
+            email_thread.run()
+        except:
+            response = {
+                "responseCode": 0,
+                "message": "Could not send password reset link to your email. Please try again"
+            }
+
+            return Response(data=response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         PasswordReset.objects.create(
             user=user,

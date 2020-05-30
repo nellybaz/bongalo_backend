@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apartment.models import Apartment, Category, Review, Images, Amenity, ActiveBooking
+from apartment.models import Apartment, Category, Review, Images, Amenity, Booking
 
 
 class ImagesAdmin(admin.ModelAdmin):
@@ -57,12 +57,13 @@ class BookingAdmin(admin.ModelAdmin):
         "number_of_guest",
         "date_from",
         "date_to",
-        "check_in",
-        "check_out")
+        # "check_in",
+        # "check_out"
+    )
 
 
 admin.site.register(Amenity, AmenityAdmin)
-admin.site.register(ActiveBooking, BookingAdmin)
+admin.site.register(Booking, BookingAdmin)
 admin.site.register(Apartment, ApartmentAdmin)
 admin.site.register(Images, ImagesAdmin)
 admin.site.register(Category, CategoryAdmin)

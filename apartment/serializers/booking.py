@@ -1,4 +1,4 @@
-from apartment.models import Apartment, ActiveBooking
+from apartment.models import Apartment, Booking
 from rest_framework import serializers
 from authentication.models import UserProfile
 
@@ -11,8 +11,8 @@ class BookingSerializer(serializers.Serializer):
             is_active=True))
     date_from = serializers.DateField()
     date_to = serializers.DateField()
-    check_in = serializers.TimeField()
-    check_out = serializers.TimeField()
+    # check_in = serializers.TimeField()
+    # check_out = serializers.TimeField()
     number_of_rooms = serializers.IntegerField()
     number_of_guest = serializers.IntegerField()
 
@@ -26,7 +26,7 @@ class BookingSerializer(serializers.Serializer):
         if attrs['number_of_rooms'] == 0:
             raise serializers.ValidationError("you cannot book 0 rooms")
         # Check active bookings for the apartment to know if room is available
-        active_bookings = ActiveBooking.objects.filter(
+        active_bookings = Booking.objects.filter(
             apartment=attrs['apartment'], is_active=True)
         booked_room_for_apartment = 0
         for booking in active_bookings:
@@ -39,13 +39,13 @@ class BookingSerializer(serializers.Serializer):
                 "not enough rooms, available rooms are " +
                 str(available_rooms))
 
-        if attrs['date_from'] < attrs['apartment'].available_from:
-            raise serializers.ValidationError(
-                "apartment is not available at this time")
-
-        if attrs['date_to'] > attrs['apartment'].available_to:
-            raise serializers.ValidationError(
-                "apartment is not available till this time")
+        # if attrs['date_from'] < attrs['apartment'].available_from:
+        #     raise serializers.ValidationError(
+        #         "apartment is not available at this time")
+        #
+        # if attrs['date_to'] > attrs['apartment'].available_to:
+        #     raise serializers.ValidationError(
+        #         "apartment is not available till this time")
 
         return attrs
 
@@ -54,7 +54,7 @@ class BookingSerializer(serializers.Serializer):
         user = UserProfile.objects.get(uuid=validated_data['client']).user
 
         validated_data['client'] = user
-        booking = ActiveBooking.objects.create(
+        booking = Booking.objects.create(
             **validated_data
         )
 

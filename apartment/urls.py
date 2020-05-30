@@ -50,7 +50,7 @@ urlpatterns = [
         name="get_apartment_image"),
     path(
         'book',
-        views.BookingView.as_view(),
+        views.CreateBookingView.as_view(),
         name="book_apartment"),
     path(
         'rate',

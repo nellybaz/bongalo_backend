@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from apartment.models import Booking
 from authentication.models import UserProfile
+from utils.email_thread import SendEmailThread
 
 
 class PaymentGateWay(object):
@@ -107,10 +108,21 @@ class PaymentView(APIView):
             user_booking.save()
             res = payment_gateway.verify_token(token).content.decode()
             print(res)
+
             if 'Transaction Paid' in res:
+                try:
+                    email_message = "Hi, {0} \nThank you for booking with us.".format(user.user.first_name)
+
+                    email_thread = SendEmailThread(user.user.email, "Bongalo Booking Confirmation", email_message)
+
+                    # Spawn a new thread to run sending email, to reduce the response time for the users
+                    email_thread.run()
+                except BaseException:
+                    pass
+
                 return Response(data={'responseCode': 1, 'message': 'Paid completed'},
                                 status=status.HTTP_200_OK)
 
-            return Response(data={'responseCode': -1}, status=status.HTTP_200_OK)
+            return Response(data={'responseCode': -1}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data={'responseCode': 0}, status=status.HTTP_200_OK)
+        return Response(data={'responseCode': 0}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

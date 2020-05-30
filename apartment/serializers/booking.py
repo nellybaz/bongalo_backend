@@ -51,7 +51,7 @@ class BookingSerializer(serializers.Serializer):
 
     def create(self, validated_data):
 
-        user = UserProfile.objects.get(uuid=validated_data['client']).user
+        user = UserProfile.objects.get(uuid=validated_data['client'])
 
         validated_data['client'] = user
         booking = Booking.objects.create(

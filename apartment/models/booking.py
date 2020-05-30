@@ -1,6 +1,6 @@
 from django.db import models
 from uuid import uuid4
-from django.contrib.auth.models import User
+from authentication.models import UserProfile
 from .apartment import Apartment
 
 
@@ -10,7 +10,7 @@ class Booking(models.Model):
         max_length=225,
         blank=False,
         primary_key=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
+    client = models.ForeignKey(UserProfile, on_delete=models.CASCADE, blank=False)
     apartment = models.ForeignKey(
         Apartment,
         on_delete=models.CASCADE,

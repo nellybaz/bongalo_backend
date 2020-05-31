@@ -134,6 +134,20 @@ class EmailService:
             print(e)
             raise e
 
+    def newsletter_subscription(self, payload):
+        # self.message.add_substitution(Substitution("lastName", payload['lastName']))
+
+        self.message.template_id = '59c157a6-a911-4954-879e-b55bd31c954d'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            print("sendgrid error here below ====>>>>>>")
+            print(e)
+            raise e
+
     def host_booking_notification(self, payload):
         self.message.add_substitution(Substitution("lastName", payload['booking'].apartment.owner.user.last_name))
         self.message.add_substitution(Substitution("guestFullName", "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name)))

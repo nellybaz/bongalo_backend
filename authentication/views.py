@@ -797,6 +797,17 @@ class UserSubscribe(APIView):
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         UserSubscribeModel.objects.create(email=email)
+
+        try:
+            email_service = EmailService(email)
+            payload = {
+                # 'recipient_name': request.data.get('last_name'),
+            }
+            email_thread = SendEmailThread(email_service.newsletter_subscription, payload=payload)
+            email_thread.run()
+        except BaseException as err:
+            print(str(err))
+
         response = {
             "responseCode": 1,
             "message": "Thanks for subscribing",

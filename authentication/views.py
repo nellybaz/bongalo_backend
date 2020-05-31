@@ -241,7 +241,8 @@ class VerifyEmail(APIView):
                 'message': 'Wrong pin'
             }
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
-        except BaseException:
+        except BaseException as err:
+            print(str(err))
             response = {
                 'responseCode': 0,
                 'data': 'Error occurred'

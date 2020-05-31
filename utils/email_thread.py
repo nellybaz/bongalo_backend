@@ -56,6 +56,7 @@ class SendEmailThread(threading.Thread):
         # send_email_with_template()
         print("before running email function")
         self.email_function()
+        print("after running the email function")
 
 
 class EmailService:
@@ -90,6 +91,26 @@ class EmailService:
     def send_registration_pin(self, recipient_last_name, verification_pin):
         self.message.add_substitution(Substitution("lastName", recipient_last_name))
         self.message.add_substitution(Substitution('pinNumber', verification_pin))
+
+        self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            print("response from sendgrid ======>>>>>>")
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+        except Exception as e:
+            print("sendgrid error here below ====>>>>>>")
+            print(e)
+
+
+
+    def send_booking_confirmation(self, payload):
+        self.message.add_substitution(Substitution("placeName", payload['placeName']))
+        self.message.add_substitution(Substitution('hostName', payload['hostName']))
+        self.message.add_substitution(Substitution('hostName', payload['hostName']))
 
         self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
 

@@ -8,7 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 import datetime as dt
-from utils.email_thread import SendEmailThread
+from utils.email_thread import SendEmailThread, EmailService
 from authentication.serializers import UserProfileSerializer
 from datetime import  datetime
 
@@ -155,14 +155,15 @@ class ApartmentCreateAPIView(APIView):
             serialized.save()
 
             try:
-                email_message = "Hi \nYou have successfully listed your house for rent, sit back and relax while we do " \
-                                "the rest "
-                email_thread = SendEmailThread(request.user.email, "Apartment Listing Alert", email_message)
-
-                # Spawn a new thread to run sending email, to reduce the response time for the users
+                email_service = EmailService(request.user.email)
+                payload = {
+                    'lastName': request.user.last_name,
+                    # 'verification_pin': verification_pin
+                }
+                email_thread = SendEmailThread(email_service.apartment_listing_confirmation, payload=payload)
                 email_thread.run()
-            except:
-                pass
+            except BaseException as e:
+                print(str(e))
 
             response_data = {
                 "responseCode": 1,

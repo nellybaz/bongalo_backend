@@ -105,7 +105,7 @@ class PasswordChangeView(APIView):
 
         user = UserProfile.objects.get(user=request.user, is_active=True)
         new_password = request.data.get('password')
-        old_password =  request.data.get('old_password')
+        old_password = request.data.get('old_password')
         if not new_password:
             response = {
                 "reponseCode":0,
@@ -123,13 +123,18 @@ class PasswordChangeView(APIView):
         user.user.set_password(new_password)
         user.user.save()
 
-        email_message = "Hi \nYou recently changed your password. If this was not you, please call us now. \nThanks"
-        email_thread = SendEmailThread(user.user.email, "Password Change Alert", email_message)
-
-        email_thread.run()
+        try:
+            email_service = EmailService(user.user.email)
+            payload = {
+                'lastName': user.user.last_name,
+            }
+            email_thread = SendEmailThread(email_service.password_change, payload=payload)
+            email_thread.run()
+        except BaseException as e:
+            print(str(e))
 
         response = {
-            "responseCode":1,
+            "responseCode": 1,
             'message': 'Password has been changed successfully'
         }
         return Response(data=response, status=status.HTTP_200_OK)

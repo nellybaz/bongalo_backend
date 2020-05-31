@@ -123,7 +123,7 @@ class EmailService:
     def password_change(self, payload):
         self.message.add_substitution(Substitution("lastName", payload['lastName']))
 
-        self.message.template_id = 'b3e0163a-6080-4e2c-b4b4-9d744796e6b6'
+        self.message.template_id = 'd56910c1-8e37-4e6d-b6b2-bfd86ea02ddd'
 
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
@@ -135,25 +135,34 @@ class EmailService:
             raise e
 
     def send_payment_confirmation(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload['lastName']))
-        self.message.add_substitution(Substitution('nameOfPlace', payload['nameOfPlace']))
-        self.message.add_substitution(Substitution('nameOfHost', payload['nameOfHost']))
-        self.message.add_substitution(Substitution('dateOfPayment', payload['dateOfPayment']))
-        self.message.add_substitution(Substitution('bookingReference', payload['bookingReference']))
+        booked_nights = 1
+        try:
+            booked_nights = (payload['booking'].date_from - payload['booking'].date_to)
+            print("correct booked nights is {0}".format(booked_nights))
+        except BaseException as e:
+            print("wrong booked nights and error is {0}".format(str(e)))
 
-        self.message.add_substitution(Substitution('name', payload['name']))
-        self.message.add_substitution(Substitution('dateFrom', payload['dateFrom']))
-        self.message.add_substitution(Substitution('dateTo', payload['dateTo']))
-        self.message.add_substitution(Substitution('checkinTime', payload['checkinTime']))
-        self.message.add_substitution(Substitution('checkoutTime', payload['checkoutTime']))
+        apartment_price = payload['booking'].apartment.price
+        service_fee = (booked_nights * apartment_price) * 0.05
 
-        self.message.add_substitution(Substitution('appartmentName', payload['appartmentName']))
-        self.message.add_substitution(Substitution('price', payload['price']))
-        self.message.add_substitution(Substitution('numberOfNight', payload['numberOfNight']))
-        self.message.add_substitution(Substitution('serviceFee', payload['serviceFee']))
+        self.message.add_substitution(Substitution("lastName", payload['booking'].client.user.last_name))
+        self.message.add_substitution(Substitution('nameOfPlace', payload['booking'].apartment.title))
+        self.message.add_substitution(Substitution('nameOfHost', "{0} {1}".format(payload['booking'].apartment.owner.user.first_name, payload['booking'].apartment.owner.user.last_name,)))
+        self.message.add_substitution(Substitution('dateOfPayment', payload['booking'].creatd_at))
+        self.message.add_substitution(Substitution('bookingReference', payload['booking'].uuid))
 
-        self.message.add_substitution(Substitution('total', payload['total']))
+        self.message.add_substitution(Substitution('name', "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name,)))
+        self.message.add_substitution(Substitution('dateFrom', payload['booking'].date_from))
+        self.message.add_substitution(Substitution('dateTo', payload['booking'].date_to))
+        self.message.add_substitution(Substitution('checkinTime', payload['booking'].apartment.check_in))
+        self.message.add_substitution(Substitution('checkoutTime', payload['booking'].apartment.check_out))
 
+        # self.message.add_substitution(Substitution('apartmentName', payload['booking'].apartment.title))
+        self.message.add_substitution(Substitution('price', str(apartment_price)))
+        self.message.add_substitution(Substitution('numberOfNight', str(booked_nights)))
+        self.message.add_substitution(Substitution('serviceFee', str(service_fee)))
+
+        self.message.add_substitution(Substitution('total', str(service_fee + apartment_price)))
 
         self.message.template_id = '7e8da248-c9c0-4a7a-84b0-0e805c7f5fe6'
 

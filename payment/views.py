@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from apartment.models import Booking
 from authentication.models import UserProfile
-from utils.email_thread import SendEmailThread
+from utils.email_thread import SendEmailThread, EmailService
 
 
 class PaymentGateWay(object):
@@ -122,14 +122,14 @@ class PaymentView(APIView):
 
             if 'Transaction Paid' in res:
                 try:
-                    email_message = "Hi, {0} \nThank you for booking with us.".format(user.user.first_name)
-
-                    email_thread = SendEmailThread(user.user.email, "Bongalo Booking Confirmation", email_message)
-
-                    # Spawn a new thread to run sending email, to reduce the response time for the users
+                    email_service = EmailService(user.user.email)
+                    payload = {
+                        'booking': user_booking,
+                    }
+                    email_thread = SendEmailThread(email_service.send_payment_confirmation, payload=payload)
                     email_thread.run()
-                except BaseException:
-                    pass
+                except BaseException as e:
+                    print(str(e))
 
                 return Response(data={'responseCode': 1, 'message': 'Paid completed'},
                                 status=status.HTTP_200_OK)

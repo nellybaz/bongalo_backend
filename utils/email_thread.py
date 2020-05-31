@@ -71,8 +71,11 @@ class EmailService:
             html_content='<strong>and easy to do anywhere, even with Python</strong>',
         )
 
-        sender_name_sub = Substitution("Sender_Name", "Bongalo Ltd")
-        self.message.add_substitution(sender_name_sub)
+        self.message.add_substitution(Substitution("Sender_Name", "Bongalo Ltd"))
+        self.message.add_substitution(Substitution("Sender_Address", "KG 622 St"))
+        self.message.add_substitution(Substitution("Sender_City", "Fair View Building"))
+        self.message.add_substitution(Substitution("Sender_State", "Kigali"))
+        self.message.add_substitution(Substitution("Sender_Zip", "5377"))
 
     def send_welcome(self, payload):
         self.message.add_substitution(Substitution("name", payload['recipient_name']))
@@ -82,13 +85,11 @@ class EmailService:
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
             response = sendgrid_client.send(self.message)
-            print("response from sendgrid ======>>>>>>")
-            print(response.status_code)
-            print(response.body)
-            print(response.headers)
+            return response
         except Exception as e:
             print("sendgrid error here below ====>>>>>>")
             print(e)
+            raise e
 
     def send_registration_pin(self, payload):
         self.message.add_substitution(Substitution("lastName", payload['recipient_last_name']))
@@ -99,33 +100,43 @@ class EmailService:
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
             response = sendgrid_client.send(self.message)
-            print("response from sendgrid ======>>>>>>")
-            print(response.status_code)
-            print(response.body)
-            print(response.headers)
+            return response
         except Exception as e:
             print("sendgrid error here below ====>>>>>>")
             print(e)
+            raise e
+
+    def send_payment_confirmation(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload['lastName']))
+        self.message.add_substitution(Substitution('nameOfPlace', payload['nameOfPlace']))
+        self.message.add_substitution(Substitution('nameOfHost', payload['nameOfHost']))
+        self.message.add_substitution(Substitution('dateOfPayment', payload['dateOfPayment']))
+        self.message.add_substitution(Substitution('bookingReference', payload['bookingReference']))
+
+        self.message.add_substitution(Substitution('name', payload['name']))
+        self.message.add_substitution(Substitution('dateFrom', payload['dateFrom']))
+        self.message.add_substitution(Substitution('dateTo', payload['dateTo']))
+        self.message.add_substitution(Substitution('checkinTime', payload['checkinTime']))
+        self.message.add_substitution(Substitution('checkoutTime', payload['checkoutTime']))
+
+        self.message.add_substitution(Substitution('appartmentName', payload['appartmentName']))
+        self.message.add_substitution(Substitution('price', payload['price']))
+        self.message.add_substitution(Substitution('numberOfNight', payload['numberOfNight']))
+        self.message.add_substitution(Substitution('serviceFee', payload['serviceFee']))
+
+        self.message.add_substitution(Substitution('total', payload['total']))
 
 
-
-    def send_booking_confirmation(self, payload):
-        self.message.add_substitution(Substitution("placeName", payload['placeName']))
-        self.message.add_substitution(Substitution('hostName', payload['hostName']))
-        self.message.add_substitution(Substitution('hostName', payload['hostName']))
-
-        self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
+        self.message.template_id = '7e8da248-c9c0-4a7a-84b0-0e805c7f5fe6'
 
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
             response = sendgrid_client.send(self.message)
-            print("response from sendgrid ======>>>>>>")
-            print(response.status_code)
-            print(response.body)
-            print(response.headers)
+            return response
         except Exception as e:
             print("sendgrid error here below ====>>>>>>")
             print(e)
+            raise e
 
 
 

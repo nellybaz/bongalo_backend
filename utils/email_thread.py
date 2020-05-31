@@ -23,7 +23,7 @@ def send_email_with_template():
     message = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
         to_emails='nellybaz10@gmail.com',
-        # html_content='<strong>and easy to do anywhere, even with Python</strong>'
+        html_content='<strong>and easy to do anywhere, even with Python</strong>'
     )
     message.dynamic_template_data = {
         'name': 'Nelson',

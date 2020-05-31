@@ -131,6 +131,16 @@ class PaymentView(APIView):
                 except BaseException as e:
                     print(str(e))
 
+                try:
+                    email_service = EmailService(user_booking.apartment.owner.user.email)
+                    payload = {
+                        'booking': user_booking,
+                    }
+                    email_thread = SendEmailThread(email_service.host_booking_notification, payload=payload)
+                    email_thread.run()
+                except BaseException as e:
+                    print(str(e))
+
                 return Response(data={'responseCode': 1, 'message': 'Paid completed'},
                                 status=status.HTTP_200_OK)
 

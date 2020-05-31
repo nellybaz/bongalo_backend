@@ -134,6 +134,25 @@ class EmailService:
             print(e)
             raise e
 
+    def host_booking_notification(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload['booking'].apartment.owner.user.last_name))
+        self.message.add_substitution(Substitution("guestFullName", "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name)))
+        self.message.add_substitution(Substitution("referenceNumber", payload['booking'].uuid))
+        self.message.add_substitution(Substitution("dateFrom", payload['booking'].date_from))
+        self.message.add_substitution(Substitution("dateTo", payload['booking'].date_to))
+        self.message.add_substitution(Substitution("guestEmail", payload['booking'].client.user.email))
+
+        self.message.template_id = '8bfc2d14-588b-4678-acd1-00f0c47a2f2e'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            print("sendgrid error here below ====>>>>>>")
+            print(e)
+            raise e
+
     def send_payment_confirmation(self, payload):
         booked_nights = 1
         try:
@@ -147,8 +166,9 @@ class EmailService:
 
         self.message.add_substitution(Substitution("lastName", payload['booking'].client.user.last_name))
         self.message.add_substitution(Substitution('nameOfPlace', payload['booking'].apartment.title))
+        self.message.add_substitution(Substitution('hostEmail', payload['booking'].apartment.owner.user.email))
         self.message.add_substitution(Substitution('nameOfHost', "{0} {1}".format(payload['booking'].apartment.owner.user.first_name, payload['booking'].apartment.owner.user.last_name,)))
-        self.message.add_substitution(Substitution('dateOfPayment', payload['booking'].creatd_at))
+        self.message.add_substitution(Substitution('dateOfPayment', payload['booking'].created_at))
         self.message.add_substitution(Substitution('bookingReference', payload['booking'].uuid))
 
         self.message.add_substitution(Substitution('name', "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name,)))

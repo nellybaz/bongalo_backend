@@ -45,17 +45,19 @@ from sendgrid.helpers.mail import Mail, Personalization, Email, Substitution
 
 class SendEmailThread(threading.Thread):
     email_function = None
+    payload = None
 
-    def __init__(self, email_function):
+    def __init__(self, email_function, payload):
         threading.Thread.__init__(self)
         self.email_function = email_function
+        self.payload = payload
         print("initing the thread")
 
     def run(self):
         # send_email(self.recipient, self.subject, self.message)
         # send_email_with_template()
         print("before running email function")
-        self.email_function()
+        self.email_function(self.payload)
         print("after running the email function")
 
 
@@ -72,8 +74,8 @@ class EmailService:
         sender_name_sub = Substitution("Sender_Name", "Bongalo Ltd")
         self.message.add_substitution(sender_name_sub)
 
-    def send_welcome(self, recipient_name):
-        self.message.add_substitution(Substitution("name", recipient_name))
+    def send_welcome(self, payload):
+        self.message.add_substitution(Substitution("name", payload['recipient_name']))
 
         self.message.template_id = '1c0076ca-2632-4457-b292-273cd87100ba'
 
@@ -88,9 +90,9 @@ class EmailService:
             print("sendgrid error here below ====>>>>>>")
             print(e)
 
-    def send_registration_pin(self, recipient_last_name, verification_pin):
-        self.message.add_substitution(Substitution("lastName", recipient_last_name))
-        self.message.add_substitution(Substitution('pinNumber', verification_pin))
+    def send_registration_pin(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload['recipient_last_name']))
+        self.message.add_substitution(Substitution('pinNumber', payload['verification_pin']))
 
         self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
 

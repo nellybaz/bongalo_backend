@@ -310,8 +310,9 @@ class UserRegisterViews(APIView):
 
             email_service = EmailService(request.data.get("email"))
             email_thread = SendEmailThread(email_service.send_registration_pin(request.data.get('last_name'), verification_pin))
-
+            print("email service and thread initialized without error =====>>>>>")
             email_thread.run()
+            print("email thread run done ===>>>>>>")
         except BaseException as e:
             response_data = {'responseCode': 0,
                              'data': [],

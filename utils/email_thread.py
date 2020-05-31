@@ -49,10 +49,12 @@ class SendEmailThread(threading.Thread):
     def __init__(self, email_function):
         threading.Thread.__init__(self)
         self.email_function = email_function
+        print("initing the thread")
 
     def run(self):
         # send_email(self.recipient, self.subject, self.message)
         # send_email_with_template()
+        print("before running email function")
         self.email_function()
 
 

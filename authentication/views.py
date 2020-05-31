@@ -108,7 +108,7 @@ class PasswordChangeView(APIView):
         old_password = request.data.get('old_password')
         if not new_password:
             response = {
-                "reponseCode":0,
+                "responseCode": 0,
                 'message': 'Password is needed'
             }
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)

@@ -193,7 +193,7 @@ class EmailService:
         self.message.add_substitution(Substitution('dateOfPayment', created_at))
         self.message.add_substitution(Substitution('bookingReference', payload['booking'].uuid))
 
-        self.message.add_substitution(Substitution('name', "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name,)))
+        self.message.add_substitution(Substitution('clientName', "{0} {1}".format(payload['booking'].client.user.first_name, payload['booking'].client.user.last_name,)))
         self.message.add_substitution(Substitution('dateFrom', date_from))
         self.message.add_substitution(Substitution('dateTo', date_to))
         self.message.add_substitution(Substitution('checkinTime', payload['booking'].apartment.check_in))

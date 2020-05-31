@@ -4,7 +4,7 @@ from django.conf import settings
 
 import os
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Personalization, Email
+from sendgrid.helpers.mail import Mail, Personalization, Email, Substitution
 
 
 
@@ -22,19 +22,21 @@ def send_email(to, subject, message):
 def send_email_with_template():
     message = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
-        # to_emails='nellybaz10@gmail.com',
+        to_emails='nellybaz10@gmail.com',
         html_content='<strong>and easy to do anywhere, even with Python</strong>',
-
     )
 
-    p = Personalization()
-    p.add_to(Email('nellybaz10@gmail.com'))
-    p.dynamic_template_data = {
-        'name': 'Nelson',
-    }
+    # p = Personalization()
+    # p.dynamic_template_data = {
+    #     'name': 'Nelson',
+    # }
+    # message.add_personalization(p)
+
+    sub = Substitution("name", "Nelson")
+    message.add_substitution(sub)
 
     message.template_id = '1c0076ca-2632-4457-b292-273cd87100ba'
-    message.add_personalization(p)
+
     try:
         print('sendgrid api key is {0}'.format(settings.SENDGRID_API_KEY))
         sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))

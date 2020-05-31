@@ -30,12 +30,11 @@ def send_email_with_template():
     }
     message.template_id = '1c0076ca-2632-4457-b292-273cd87100ba'
     try:
+        print('sendgrid api key is {0}'.format(settings.SENDGRID_API_KEY))
         sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
         response = sendgrid_client.send(message)
         print("response from sendgrid ======>>>>>>")
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
+        print(response)
     except Exception as e:
         print("sendgrid error here below ====>>>>>>")
         print(e)

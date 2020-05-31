@@ -20,7 +20,7 @@ from apartment.serializers import ReviewSerializer
 from .serializers import UserRegisterSerializer, VerifyUserSerializer
 from bongalo_backend.settings import PINDO_API_TOKEN
 from cryptography.fernet import Fernet
-from utils.email_thread import SendEmailThread
+from utils.email_thread import SendEmailThread, EmailService
 
 
 def send_email(to, subject, message):
@@ -307,14 +307,15 @@ class UserRegisterViews(APIView):
                 "pin_code": verification_pin},
             partial=True)
         try:
-            email_message = "Hi, \nYour pin verification is " +verification_pin
 
-            email_thread = SendEmailThread(request.data.get('email'), "Bongalo Email Verification", email_message)
+            email_service = EmailService(request.data.get("email"))
+            email_thread = SendEmailThread(email_service.send_registration_pin(request.data.get('last_name'), verification_pin))
 
-            # Spawn a new thread to run sending email, to reduce the response time for the users
             email_thread.run()
-        except BaseException:
-            response_data = {'responseCode': 0, 'data': [], 'message': 'Could not send registration token please try again'}
+        except BaseException as e:
+            response_data = {'responseCode': 0,
+                             'data': [],
+                             'message': 'Could not send registration token please try again '+str(e)}
             return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if serialized.is_valid():

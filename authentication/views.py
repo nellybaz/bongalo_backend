@@ -144,11 +144,19 @@ class ResendVerificationView(APIView):
             user_verify_object = PinVerify.objects.get(user=user)
             user_verify_object.pin = verification_pin
             user_verify_object.save()
-            send_email(
-                request.data.get('email'),
-                "Bongalo Email Verification",
-                "Hi, \nYour pin verification is " +
-                verification_pin)
+            try:
+                email_service = EmailService(email)
+                payload = {
+                    'recipient_last_name': user.user.last_name,
+                    'verification_pin': verification_pin
+                }
+                email_thread = SendEmailThread(email_service.send_registration_pin, payload=payload)
+                email_thread.run()
+            except BaseException as e:
+                response_data = {'responseCode': 0,
+                                 'data': [],
+                                 'message': 'Could not send registration token please try again ' + str(e)}
+                return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             response = {
                 'responseCode': 1,
@@ -378,16 +386,15 @@ class SocialAuth(APIView):
                 "request": "post"}, partial=True)
         if serialized.is_valid():
             serialized.save()
-
             try:
-                email_message = "Hi, \nThank you for signing up on Bongalo, You are the best"
-
-                email_thread = SendEmailThread(request.data.get('email'), "Bongalo Registration", email_message)
-
-                # Spawn a new thread to run sending email, to reduce the response time for the users
+                email_service = EmailService(request.data.get('email'))
+                payload = {
+                    'recipient_name': request.data.get('last_name'),
+                }
+                email_thread = SendEmailThread(email_service.send_welcome, payload=payload)
                 email_thread.run()
-            except BaseException:
-                pass
+            except BaseException as err:
+                print(str(err))
 
             response_data = {'responseCode': 1, 'data': serialized.data}
             return Response(data=response_data, status=status.HTTP_201_CREATED)

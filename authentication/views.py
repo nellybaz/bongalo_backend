@@ -221,6 +221,17 @@ class VerifyEmail(APIView):
             user_pin = PinVerify.objects.get(user=user)
             user.is_active = True
             user.save()
+
+            try:
+                email_service = EmailService(email)
+                payload = {
+                    'recipient_name': user.user.last_name,
+                }
+                email_thread = SendEmailThread(email_service.send_welcome, payload=payload)
+                email_thread.run()
+            except BaseException as err:
+                print(str(err))
+
             if user_pin.pin == pin:
                 response = {
                     'responseCode': 1,
@@ -307,17 +318,15 @@ class UserRegisterViews(APIView):
                 "request": "post",
                 "pin_code": verification_pin},
             partial=True)
-        try:
 
+        try:
             email_service = EmailService(request.data.get("email"))
             payload = {
                 'recipient_last_name': request.data.get('last_name'),
                 'verification_pin': verification_pin
             }
             email_thread = SendEmailThread(email_service.send_registration_pin, payload=payload)
-            print("email service and thread initialized without error =====>>>>>")
             email_thread.run()
-            print("email thread run done ===>>>>>>")
         except BaseException as e:
             response_data = {'responseCode': 0,
                              'data': [],

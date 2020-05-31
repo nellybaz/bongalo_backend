@@ -106,6 +106,20 @@ class EmailService:
             print(e)
             raise e
 
+    def apartment_listing_confirmation(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload['lastName']))
+
+        self.message.template_id = 'b3e0163a-6080-4e2c-b4b4-9d744796e6b6'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            print("sendgrid error here below ====>>>>>>")
+            print(e)
+            raise e
+
     def send_payment_confirmation(self, payload):
         self.message.add_substitution(Substitution("lastName", payload['lastName']))
         self.message.add_substitution(Substitution('nameOfPlace', payload['nameOfPlace']))

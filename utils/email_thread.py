@@ -25,9 +25,9 @@ def send_email_with_template():
         to_emails='nellybaz10@gmail.com',
         html_content='<strong>and easy to do anywhere, even with Python</strong>'
     )
-    message.dynamic_template_data = {
-        'name': 'Nelson',
-    }
+    # message.dynamic_template_data = {
+    #     'name': 'Nelson',
+    # }
     message.template_id = '1c0076ca-2632-4457-b292-273cd87100ba'
     try:
         print('sendgrid api key is {0}'.format(settings.SENDGRID_API_KEY))

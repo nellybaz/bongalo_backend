@@ -1,7 +1,7 @@
 from apartment.serializers import ApartmentSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
-from apartment.models import Apartment
+from apartment.models import Apartment, Booking
 from rest_framework.permissions import IsAuthenticated
 from apartment.permissions import IsOwnerOrReadOnly as IsOwnerOnly
 from rest_framework.authentication import TokenAuthentication
@@ -10,6 +10,7 @@ from rest_framework import status
 import datetime as dt
 from utils.email_thread import SendEmailThread
 from authentication.serializers import UserProfileSerializer
+from datetime import  datetime
 
 
 # TODO: Implement number of views for an apartment
@@ -31,9 +32,26 @@ class ApartmentDetailsView(APIView):
             serialized = ApartmentSerializer(
                 apartment)
             if serialized and owner_details_serialized:
+                all_bookings_for_apartment = Booking.objects.filter(apartment=apartment, is_completed=True)
+                unavailable_dates_for_apartment = []
+                today = datetime.now().date()
+                
+                if "full_place" in apartment.space:
+                    for booking in all_bookings_for_apartment:
+                        if booking.date_from > today or today < booking.date_to:
+                            unavailable_dates_for_apartment.append({"from": booking.date_from, "to": booking.date_to})
+
+                elif "private_room" in apartment.space:
+                    booking_for_getting_counts = []
+                    for booking in all_bookings_for_apartment:
+                        if booking.date_from > today or today < booking.date_to:
+                            booking_for_getting_counts.append({"from": booking.date_from, "to": booking.date_to})
+                    if len(booking_for_getting_counts) >= apartment.available_rooms:
+                        unavailable_dates_for_apartment = booking_for_getting_counts
+                        
                 response_data = {
                     "responseCode": 1,
-                    "data": {**serialized.data, "owner_details": {**owner_details_serialized.data}},
+                    "data": {**serialized.data, "owner_details": {**owner_details_serialized.data}, "unavailable_dates": unavailable_dates_for_apartment},
                     "message": "ok"
                 }
 

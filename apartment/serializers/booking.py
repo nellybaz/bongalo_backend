@@ -27,10 +27,8 @@ class BookingSerializer(serializers.Serializer):
             raise serializers.ValidationError("you cannot book 0 rooms")
         # Check active bookings for the apartment to know if room is available
         active_bookings = Booking.objects.filter(
-            apartment=attrs['apartment'], is_active=True)
-        booked_room_for_apartment = 0
-        for booking in active_bookings:
-            booked_room_for_apartment += booking.number_of_rooms
+            apartment=attrs['apartment'], is_active=True, is_completed=True)
+        booked_room_for_apartment = len(active_bookings)
 
         available_rooms = attrs['apartment'].available_rooms - \
             booked_room_for_apartment
@@ -39,9 +37,9 @@ class BookingSerializer(serializers.Serializer):
                 "not enough rooms, available rooms are " +
                 str(available_rooms))
 
-        # if attrs['date_from'] < attrs['apartment'].available_from:
-        #     raise serializers.ValidationError(
-        #         "apartment is not available at this time")
+        if attrs['apartment'].unavailable_from <= attrs['date_from'] <= attrs['apartment'].unavailable_to:
+            raise serializers.ValidationError(
+                "apartment is not available at this time")
         #
         # if attrs['date_to'] > attrs['apartment'].available_to:
         #     raise serializers.ValidationError(

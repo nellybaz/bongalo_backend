@@ -106,6 +106,17 @@ class PaymentView(APIView):
         if not user_booking.is_completed:
             user_booking.is_completed = True
             user_booking.save()
+
+            # apartment = user_booking.apartment
+            # if "private_room" in apartment.space:
+            #     if len(Booking.objects.filter(apartment=apartment, is_completed=True)) == apartment.available_rooms:
+            #         apartment.is_available = False
+            #         apartment.save()
+            #
+            # else:
+            #     apartment.is_available = False
+            #     apartment.save()
+
             res = payment_gateway.verify_token(token).content.decode()
             print(res)
 

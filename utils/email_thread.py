@@ -174,7 +174,7 @@ class EmailService:
     def send_payment_confirmation(self, payload):
         booked_nights = 1
         try:
-            booked_nights = (payload['booking'].date_from - payload['booking'].date_to)
+            booked_nights = abs((payload['booking'].date_from - payload['booking'].date_to).days)
             print("correct booked nights is {0}".format(booked_nights))
         except BaseException as e:
             print("wrong booked nights and error is {0}".format(str(e)))

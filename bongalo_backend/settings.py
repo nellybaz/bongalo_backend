@@ -156,6 +156,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://192.168.43.72:8080",
     "http://192.168.60.72:8080",
     "http://161.35.37.56",
+    "https://bongalo.co",
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

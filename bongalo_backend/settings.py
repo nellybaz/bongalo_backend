@@ -155,6 +155,7 @@ CORS_ORIGIN_WHITELIST = [
     "https://bongalo-frontend.herokuapp.com",
     "http://192.168.43.72:8080",
     "http://192.168.60.72:8080",
+    "http://161.35.37.56",
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

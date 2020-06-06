@@ -66,7 +66,7 @@ class EmailService:
 
     def __init__(self, recipient_email):
         self.message = Mail(
-            from_email=(settings.DEFAULT_FROM_EMAIL, 'Bongalo Ltd'),
+            from_email=(settings.DEFAULT_FROM_EMAIL, 'Bongalo'),
             to_emails=recipient_email,
             html_content='<strong>and easy to do anywhere, even with Python</strong>',
         )

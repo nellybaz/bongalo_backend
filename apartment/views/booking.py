@@ -40,9 +40,7 @@ class CreateBookingView(ListCreateAPIView):
         user = UserProfile.objects.get(user=request.user)
         payment_description = 'Payment for booking of {0} from {1} to {2}'.format(apartment.title, request.data.get('date_from'), request.data.get('date_to'))
         date = datetime.now().date()
-        print("date is ---------")
         date_arr = str(date).split("-")
-        print(date_arr)
         payload = {
             'amount': request.data.get("amount"),
             'description': payment_description,
@@ -58,14 +56,13 @@ class CreateBookingView(ListCreateAPIView):
             'back_url': request.data.get("back_url"),
             'transaction_limit': '1',
             'transaction_type': 'hours',
-            'company_token': '22EEF8E8-C756-496E-BD68-EDAEF2741FB0',
+            # 'company_token': '22EEF8E8-C756-496E-BD68-EDAEF2741FB0',
+            'company_token': '108B9501-5BC1-474A-954F-240CD2616D4C',
             'company_ref': 'SDGSDFGE5646345',
-            'service_type': '8162',
+            'service_type': '36821',
             'service_date': '{}/{}/{}'.format(date_arr[0], date_arr[1], date_arr[2])
 
         }
-
-        print(payload)
 
         response_code = 0
         response_message = "Booking was successfully created"

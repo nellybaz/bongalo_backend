@@ -53,6 +53,10 @@ urlpatterns = [
         views.CreateBookingView.as_view(),
         name="book_apartment"),
     path(
+        'booking/<uuid>/cancel',
+        views.RetrieveDeleteBookingDetailsAPIView.as_view(),
+        name="get_delete_booking"),
+    path(
         'rate',
         views.RatingView.as_view(),
         name="rate_apartment"),

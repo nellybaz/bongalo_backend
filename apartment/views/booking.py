@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from payment.views import PaymentGateWay
 from datetime import datetime
 
+from utils.email_thread import EmailService, SendEmailThread
+
 
 class CreateBookingView(ListCreateAPIView):
     write_serializer_class = BookingSerializer
@@ -22,6 +24,7 @@ class CreateBookingView(ListCreateAPIView):
     def get_pay_url(self, payload):
         payment_gateway = PaymentGateWay()
         res = payment_gateway.create_token(payload)
+        print('this,', 10 * "===")
         token = res.content.decode()
         print("token is hererrrrrrrreeeeeeee=====>>>>>>>>>>")
         print(token)
@@ -72,9 +75,11 @@ class CreateBookingView(ListCreateAPIView):
         pay_url_data = {}
         response_status = status.HTTP_201_CREATED
         try:
-            pay_url_data = self.get_pay_url(payload)
+            #pay_url_data = self.get_pay_url(payload)
+            pay_url_data = {"url": "rhis"}
             response_code = 1
-        except:
+        except Exception as exc:
+            print(exc, '=====')
             response_message = "Booking unsuccessful"
             response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
             pass
@@ -90,7 +95,30 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
     serializer_class = BookingSerializer
     lookup_field = 'uuid'
     permission_classes = (IsAuthenticated, IsOwner)
+    authentication_classes = [TokenAuthentication, ]
 
     # TODO : to be implemented to set is_active = False
     def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+        user_profile = UserProfile.objects.get(user=request.user)
+        booking = Booking.objects.get(client=user_profile, uuid=self.kwargs.get('uuid'))
+        booking.is_active = False
+        booking.save()
+        serializer = self.get_serializer_class()
+        serialized_data = serializer(booking)
+        host_email = booking.apartment.owner.user.email
+        client_email = request.user.email
+        """try:
+            client_email_service = EmailService(client_email)
+            host_email_service = EmailService(host_email)
+            bongalo_email_service = EmailService('info@bongalo.co')
+            payload = {
+                'lastName': user.user.last_name,
+            }
+            email_thread = SendEmailThread(email_service.password_change, payload=payload)
+            email_thread.run()
+        except BaseException as e:
+            print(str(e))"""
+
+        return Response(
+            {'responseCode': 1, 'data': serialized_data.data, 'message': 'your booking was canceled'},
+            status=status.HTTP_204_NO_CONTENT)

@@ -405,7 +405,7 @@ class SocialAuth(APIView):
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
         response_data = {'responseCode': 0, 'data': serialized.errors, 'message': 'error occurred'}
-        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(data=respvonse_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserView(APIView):

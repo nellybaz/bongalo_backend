@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 from sendgrid import SendGridAPIClient
+from datetime import datetime
 from sendgrid.helpers.mail import Mail, Personalization, Email, Substitution
 
 #
@@ -214,7 +215,7 @@ class EmailService:
             return response
         except Exception as e:
             print("sendgrid error here below ====>>>>>>")
-            print(e)
+            print(e.body)
             raise e
 
     def perform_substitution(self, payload):
@@ -223,25 +224,23 @@ class EmailService:
         self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
         self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
         self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
-        self.message.add_substitution(Substitution("originalAmount", payload.get('original_amount')))
-        self.message.add_substitution(Substitution("cancellationFee", payload.get('cancellation_fees')))
-        self.message.add_substitution(Substitution("serviceFee", payload.get('service_fees')))
-        self.message.add_substitution(Substitution("refundAmount", payload.get('amount_to_be_refunded')))
-        self.message.add_substitution(Substitution("nonRefundableAmount", payload.get('non_refundable_amount')))
 
-    def cancelation_by_host_to_host(self, payload):
+    def cancellation_by_host_to_host(self, payload):
         self.perform_substitution(payload)
         self.message.template_id = '0fff75c5-9f70-4959-a1e8-dc02066b8631'
+        self.message.add_substitution(Substitution("originalAmount", "{:.2f}".format(payload.get('original_amount'))))
+        self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
 
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("1 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
-    def cancelation_by_host_to_guest(self, payload):
+    def cancellation_by_host_to_guest(self, payload):
         self.perform_substitution(payload)
         self.message.template_id = 'b5f95ae4-e34a-473b-80b4-ee509495ef75'
 
@@ -250,10 +249,11 @@ class EmailService:
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("2 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
-    def cancelation_by_host_to_admin(self, payload):
+    def cancellation_by_host_to_admin(self, payload):
         self.perform_substitution(payload)
 
         self.message.template_id = '4d48e05e-052f-4066-92e6-9862e99984a6'
@@ -263,11 +263,11 @@ class EmailService:
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("3 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
-
-    def cancelation_by_guest_to_host(self, payload):
+    def cancellation_by_guest_to_host(self, payload):
         self.perform_substitution(payload)
 
         self.message.template_id = '89e7c9bc-c129-4a0d-8b98-e67033195158'
@@ -277,13 +277,20 @@ class EmailService:
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("4 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
-
-    def cancelation_by_guest_to_guest(self, payload):
+    def cancellation_by_guest_to_guest(self, payload):
         self.perform_substitution(payload)
-
+        print('this_ amount', payload.get('non_refundable_amount'))
+        self.message.add_substitution(Substitution("originalAmount", "{:.2f}".format(payload.get('original_amount'))))
+        self.message.add_substitution(Substitution("cancellationFee", "{:.2f}".format(payload.get('cancellation_fees'))))
+        self.message.add_substitution(Substitution("serviceFee", "{:.2f}".format(payload.get('services_fees'))))
+        self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
+        self.message.add_substitution(Substitution("nonRefundableAmount", "{:.2f}".format(payload.get('non_refundable_amount'))))
+        self.message.add_substitution(Substitution("CancellationDate", datetime.today().strftime("DD-MM-YYYY")))
+        self.message.add_substitution(Substitution("time", datetime.now().strftime("%H:%M:%S")))
         self.message.template_id = '3feb41fb-4db4-404e-bd1d-3378c7a49788'
 
         try:
@@ -291,10 +298,11 @@ class EmailService:
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("5 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
-    def cancelation_by_guest_to_admin(self, payload):
+    def cancellation_by_guest_to_admin(self, payload):
         self.perform_substitution(payload)
 
         self.message.template_id = 'b1c2d43a-695d-40e5-acbe-6e760ff757ac'
@@ -304,7 +312,8 @@ class EmailService:
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
-            print("sendgrid error here below ====>>>>>>", e)
+            print("6 sendgrid error here below ====>>>>>>", e)
+            print(e.body)
             raise e
 
 

@@ -10,6 +10,7 @@ from authentication.models import UserProfile
 from rest_framework.response import Response
 from payment.views import PaymentGateWay
 from datetime import datetime
+from django.db.models import Q
 
 from utils.email_thread import EmailService, SendEmailThread
 
@@ -100,7 +101,8 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         user_profile = UserProfile.objects.get(user=request.user)
-        booking = Booking.objects.filter(client=user_profile, uuid=self.kwargs.get('uuid')).first()
+        booking = Booking.objects.filter(uuid=self.kwargs.get('uuid'))\
+            .filter(Q(client=user_profile) | Q(apartment__owner=user_profile)).first()
         if not booking:
             return Response({'responseCode': 0,  'message': 'There is no booking matching your criteria '},
                             status=status.HTTP_404_NOT_FOUND)
@@ -133,20 +135,20 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
                 'cancellation_fees': booking_cancellation_fees,
                 'services_fees': service_fees,
                 'non_refundable_amount': non_refundable_amount,
-                'amount_to_be_refunded': booking_amount - non_refundable_amount
+                'amount_to_be_refunded': booking_amount - non_refundable_amount if booking_amount > non_refundable_amount else 0
             }
             print(payload)
             if guest.email == cancel_by.email:
-                emails_to_send = [guest_email_service.cancelation_by_guest_to_guest,
-                                  host_email_service.cancelation_by_guest_to_host,
-                                  admin_email_service.cancelation_by_guest_to_admin]
+                emails_to_send = [guest_email_service.cancellation_by_guest_to_guest,
+                                  host_email_service.cancellation_by_guest_to_host,
+                                  admin_email_service.cancellation_by_guest_to_admin]
                 for email in emails_to_send:
                     email_thread = SendEmailThread(email, payload=payload)
                     email_thread.run()
             elif host.email == cancel_by.email:
-                emails_to_send = [guest_email_service.cancelation_by_host_to_guest,
-                                  host_email_service.cancelation_by_host_to_host,
-                                  admin_email_service.cancelation_by_host_to_admin]
+                emails_to_send = [guest_email_service.cancellation_by_host_to_guest,
+                                  host_email_service.cancellation_by_host_to_host,
+                                  admin_email_service.cancellation_by_host_to_admin]
                 for email in emails_to_send:
                     email_thread = SendEmailThread(email, payload=payload)
                     email_thread.run()

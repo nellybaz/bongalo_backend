@@ -100,7 +100,13 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         user_profile = UserProfile.objects.get(user=request.user)
-        booking = Booking.objects.get(client=user_profile, uuid=self.kwargs.get('uuid'))
+        booking = Booking.objects.filter(client=user_profile, uuid=self.kwargs.get('uuid')).first()
+        if not booking:
+            return Response({'responseCode': 0,  'message': 'There is no booking matching your criteria '},
+                            status=status.HTTP_404_NOT_FOUND)
+        if not booking.is_active:
+            return Response({'responseCode': 0,  'message': 'The booking is already canceled'},
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
         booking.is_active = False
         booking.save()
         serializer = self.get_serializer_class()

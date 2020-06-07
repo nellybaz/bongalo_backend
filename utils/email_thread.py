@@ -224,13 +224,17 @@ class EmailService:
         self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
         self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
         self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
+        self.message.add_substitution(Substitution("originalAmount", "{:.2f}".format(payload.get('original_amount'))))
+        self.message.add_substitution(Substitution("cancellationFee", "{:.2f}".format(payload.get('cancellation_fees'))))
+        self.message.add_substitution(Substitution("serviceFee", "{:.2f}".format(payload.get('services_fees'))))
+        self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
+        self.message.add_substitution(Substitution("nonRefundableAmount", "{:.2f}".format(payload.get('non_refundable_amount'))))
+        self.message.add_substitution(Substitution("CancellationDate", datetime.today().strftime('%m-%d-%Y')))
+        self.message.add_substitution(Substitution("time", datetime.now().strftime("%H:%M:%S")))
 
     def cancellation_by_host_to_host(self, payload):
         self.perform_substitution(payload)
         self.message.template_id = '0fff75c5-9f70-4959-a1e8-dc02066b8631'
-        self.message.add_substitution(Substitution("originalAmount", "{:.2f}".format(payload.get('original_amount'))))
-        self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
-
         try:
             sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
             response = sendgrid_client.send(self.message)
@@ -283,14 +287,6 @@ class EmailService:
 
     def cancellation_by_guest_to_guest(self, payload):
         self.perform_substitution(payload)
-        print('this_ amount', payload.get('non_refundable_amount'))
-        self.message.add_substitution(Substitution("originalAmount", "{:.2f}".format(payload.get('original_amount'))))
-        self.message.add_substitution(Substitution("cancellationFee", "{:.2f}".format(payload.get('cancellation_fees'))))
-        self.message.add_substitution(Substitution("serviceFee", "{:.2f}".format(payload.get('services_fees'))))
-        self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
-        self.message.add_substitution(Substitution("nonRefundableAmount", "{:.2f}".format(payload.get('non_refundable_amount'))))
-        self.message.add_substitution(Substitution("CancellationDate", datetime.today().strftime('%m-%d-%Y')))
-        self.message.add_substitution(Substitution("time", datetime.now().strftime("%H:%M:%S")))
         self.message.template_id = '3feb41fb-4db4-404e-bd1d-3378c7a49788'
 
         try:

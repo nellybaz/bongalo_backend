@@ -2,7 +2,7 @@ from django.db import models
 from uuid import uuid4
 from authentication.models import UserProfile
 from .apartment import Apartment
-
+from datetime import  timedelta, datetime
 
 class Booking(models.Model):
     uuid = models.CharField(
@@ -25,14 +25,24 @@ class Booking(models.Model):
     is_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def booking_price(self):
+        apartment_price = self.apartment.price
+        time_difference = self.date_to - self.date_from
+        numbers_of_days = time_difference.total_seconds() / 86400
+        total_price = apartment_price * numbers_of_days
+        return total_price
 
-# class BookingArchive(models.Model):
-#     uuid = models.CharField(
-#         default=uuid4,
-#         max_length=225,
-#         blank=False,
-#         primary_key=True)
-#     booking = models.ForeignKey(ActiveBooking, on_delete=models.CASCADE)
-#     was_completed = models.BooleanField(default=True)
-#     was_canceled = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
+    @property
+    def cancellation_fees(self):
+        """
+        return the cancellation fees
+        """
+        today_date = datetime.now().date()
+        days_elapsed = abs(today_date - self.date_from).days
+        if days_elapsed <= 2:
+            return 0.5
+        elif days_elapsed > 2:
+            return 1
+        elif today_date > self.date_from:
+            return 0

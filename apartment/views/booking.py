@@ -114,6 +114,10 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
         host = booking.apartment.owner.user
         cancel_by = request.user
         guest = booking.client.user
+        booking_amount = booking.booking_price
+        booking_cancellation_fees = booking.cancellation_fees * booking_amount
+        service_fees = booking_amount * 0.05
+        non_refundable_amount = booking_cancellation_fees + service_fees
 
         try:
             guest_email_service = EmailService(guest.email)
@@ -124,9 +128,14 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
                 'guest_last_name': guest.last_name,
                 'host_first_name': host.first_name,
                 'guest_first_name': guest.first_name,
-                'reference_number': booking.uuid
-
+                'reference_number': booking.uuid,
+                'original_amount': booking_amount,
+                'cancellation_fees': booking_cancellation_fees,
+                'services_fees': service_fees,
+                'non_refundable_amount': non_refundable_amount,
+                'amount_to_be_refunded': booking_amount - non_refundable_amount
             }
+            print(payload)
             if guest.email == cancel_by.email:
                 emails_to_send = [guest_email_service.cancelation_by_guest_to_guest,
                                   host_email_service.cancelation_by_guest_to_host,

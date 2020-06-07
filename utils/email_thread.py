@@ -289,7 +289,7 @@ class EmailService:
         self.message.add_substitution(Substitution("serviceFee", "{:.2f}".format(payload.get('services_fees'))))
         self.message.add_substitution(Substitution("refundAmount", "{:.2f}".format(payload.get('amount_to_be_refunded'))))
         self.message.add_substitution(Substitution("nonRefundableAmount", "{:.2f}".format(payload.get('non_refundable_amount'))))
-        self.message.add_substitution(Substitution("CancellationDate", datetime.today().strftime("DD-MM-YYYY")))
+        self.message.add_substitution(Substitution("CancellationDate", datetime.today().strftime('%m-%d-%Y')))
         self.message.add_substitution(Substitution("time", datetime.now().strftime("%H:%M:%S")))
         self.message.template_id = '3feb41fb-4db4-404e-bd1d-3378c7a49788'
 

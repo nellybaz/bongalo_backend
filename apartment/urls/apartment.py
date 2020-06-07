@@ -49,10 +49,6 @@ urlpatterns = [
         views.ImageView.as_view(),
         name="get_apartment_image"),
     path(
-        'book',
-        views.CreateBookingView.as_view(),
-        name="book_apartment"),
-    path(
         'rate',
         views.RatingView.as_view(),
         name="rate_apartment"),

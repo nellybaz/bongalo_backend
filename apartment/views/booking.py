@@ -1,6 +1,5 @@
 from apartment.serializers import BookingSerializer
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.generics import RetrieveDestroyAPIView
+from rest_framework.generics import RetrieveDestroyAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from authentication.permissions import IsOwner
@@ -75,8 +74,7 @@ class CreateBookingView(ListCreateAPIView):
         pay_url_data = {}
         response_status = status.HTTP_201_CREATED
         try:
-            #pay_url_data = self.get_pay_url(payload)
-            pay_url_data = {"url": "rhis"}
+            pay_url_data = self.get_pay_url(payload)
             response_code = 1
         except Exception as exc:
             print(exc, '=====')
@@ -97,7 +95,6 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
     permission_classes = (IsAuthenticated, IsOwner)
     authentication_classes = [TokenAuthentication, ]
 
-    # TODO : to be implemented to set is_active = False
     def delete(self, request, *args, **kwargs):
         user_profile = UserProfile.objects.get(user=request.user)
         booking = Booking.objects.get(client=user_profile, uuid=self.kwargs.get('uuid'))
@@ -107,18 +104,50 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
         serialized_data = serializer(booking)
         host_email = booking.apartment.owner.user.email
         client_email = request.user.email
-        """try:
+        try:
             client_email_service = EmailService(client_email)
             host_email_service = EmailService(host_email)
             bongalo_email_service = EmailService('info@bongalo.co')
             payload = {
-                'lastName': user.user.last_name,
+                'host_last_name': booking.apartment.owner.user.last_name,
+                'client_last_name': request.user.last_name,
+                'host_first_name': booking.apartment.owner.user.first_name,
+                'client_first_name': request.user.first_name
             }
-            email_thread = SendEmailThread(email_service.password_change, payload=payload)
-            email_thread.run()
+            email_host = SendEmailThread(host_email_service.cancelation_for_host, payload=payload)
+            email_host.run()
+            email_client = SendEmailThread(client_email_service.cancelation_for_client, payload=payload)
+            email_client.run()
         except BaseException as e:
-            print(str(e))"""
+            print(str(e))
 
         return Response(
             {'responseCode': 1, 'data': serialized_data.data, 'message': 'your booking was canceled'},
             status=status.HTTP_204_NO_CONTENT)
+
+
+class MyBooking(ListAPIView):
+    """
+    get bookings made by a client
+    """
+    serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, IsOwner)
+    authentication_classes = [TokenAuthentication, ]
+
+    def get_queryset(self):
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        return Booking.objects.filter(is_active=True, client=user_profile)
+
+
+class BookingOnMyApartment(ListAPIView):
+    """
+    get bookings made on a client apartment
+    """
+    serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, IsOwner)
+    authentication_classes = [TokenAuthentication, ]
+
+    def get_queryset(self):
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        return Booking.objects.filter(apartment__owner=user_profile, is_active=True)
+

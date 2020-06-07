@@ -5,6 +5,6 @@ from .apartment import (ApartmentCreateAPIView,
                         ApartmentSearchAPIView)
 from .review import ReviewListUpdateCreate
 from .image import ImageView
-from .booking import CreateBookingView, RetrieveDeleteBookingDetailsAPIView
+from .booking import CreateBookingView, RetrieveDeleteBookingDetailsAPIView, MyBooking, BookingOnMyApartment
 from .rating import RatingView
 from .listing import ListingView

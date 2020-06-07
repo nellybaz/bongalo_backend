@@ -150,8 +150,8 @@ class MyBooking(APIView):
 
     def get(self, request, *args, **kwargs):
         user_profile = UserProfile.objects.get(user=self.request.user)
-        my_booking = Booking.objects.filter(is_active=True, client=user_profile)
-        booking_on_my_apartment = Booking.objects.filter(apartment__owner=user_profile, is_active=True)
+        my_booking = Booking.objects.filter(is_active=True, is_completed=True, client=user_profile)
+        booking_on_my_apartment = Booking.objects.filter(apartment__owner=user_profile, is_completed=True, is_active=True)
         serialized_my_booking = self.serializer_class(my_booking, many=True)
         serialized_booking_on_my_apartment = self.serializer_class(booking_on_my_apartment, many=True)
         return Response(

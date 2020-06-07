@@ -11,12 +11,8 @@ urlpatterns = [
     path('<uuid>/cancel',
          views.RetrieveDeleteBookingDetailsAPIView.as_view(),
          name='cancel_booking'),
-    path('my_bookings',
+    path('/',
          views.MyBooking.as_view(),
-         name='my_booking'),
-    path('my_apartment_booking',
-         views.BookingOnMyApartment.as_view(),
-         name='booking_on_my_apartment')
-]
+         name='my_booking')]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

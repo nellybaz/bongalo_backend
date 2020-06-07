@@ -67,7 +67,9 @@ urlpatterns = [
     path(
         'book',
         views.CreateBookingView.as_view(),
-        name="book_apartment") # for backward compatibility
+        name="book_apartment"),
+    path('bookings',
+         views.MyBooking.as_view(),
+         name='my_booking')
 ]
-
 urlpatterns = format_suffix_patterns(urlpatterns)

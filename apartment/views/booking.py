@@ -2,6 +2,7 @@ from apartment.serializers import BookingSerializer
 from rest_framework.generics import RetrieveDestroyAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from authentication.permissions import IsOwner
 from rest_framework import status
 from apartment.models import Booking, Apartment
@@ -16,7 +17,7 @@ from utils.email_thread import EmailService, SendEmailThread
 class CreateBookingView(ListCreateAPIView):
     write_serializer_class = BookingSerializer
     read_serializer_class = BookingSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     authentication_classes = [TokenAuthentication]
     queryset = Booking.objects.filter(is_active=True).all()
 
@@ -40,7 +41,9 @@ class CreateBookingView(ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
         apartment = Apartment.objects.get(uuid=request.data.get("apartment"))
         user = UserProfile.objects.get(user=request.user)
-        payment_description = 'Payment for booking of {0} from {1} to {2}'.format(apartment.title, request.data.get('date_from'), request.data.get('date_to'))
+        payment_description = 'Payment for booking of {0} from {1} to {2}'.format(apartment.title,
+                                                                                  request.data.get('date_from'),
+                                                                                  request.data.get('date_to'))
         date = datetime.now().date()
         print("date is ---------")
         date_arr = str(date).split("-")
@@ -126,13 +129,28 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT)
 
 
-class MyBooking(ListAPIView):
+class MyBooking(APIView):
     """
     get bookings made by a client
     """
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, IsOwner)
     authentication_classes = [TokenAuthentication, ]
+
+    def get(self, request, *args, **kwargs):
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        my_booking = Booking.objects.filter(is_active=True, client=user_profile)
+        booking_on_my_apartment = Booking.objects.filter(apartment__owner=user_profile, is_active=True)
+        serialized_my_booking = self.serializer_class(my_booking, many=True)
+        serialized_booking_on_my_apartment = self.serializer_class(booking_on_my_apartment, many=True)
+        return Response(
+            {'responseCode': 1,
+             'data': {
+                 'my_booking': serialized_my_booking.data,
+                'booking_on_my_apartment': serialized_booking_on_my_apartment.data
+             },
+             'message': 'your booking was retrieved'},
+            status=status.HTTP_200_OK)
 
     def get_queryset(self):
         user_profile = UserProfile.objects.get(user=self.request.user)
@@ -150,4 +168,3 @@ class BookingOnMyApartment(ListAPIView):
     def get_queryset(self):
         user_profile = UserProfile.objects.get(user=self.request.user)
         return Booking.objects.filter(apartment__owner=user_profile, is_active=True)
-

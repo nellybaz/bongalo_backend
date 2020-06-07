@@ -113,7 +113,7 @@ class UserRegisterSerializer(serializers.Serializer):
 
         # Separate data for profile model
         profile_data = {
-            # "is_admin": validated_data.pop("is_admin"),
+            "is_admin": False,
             "is_active": validated_data.pop("is_active"),
         }
 

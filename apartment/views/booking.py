@@ -102,22 +102,36 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
         booking.save()
         serializer = self.get_serializer_class()
         serialized_data = serializer(booking)
-        host_email = booking.apartment.owner.user.email
-        client_email = request.user.email
+        host = booking.apartment.owner.user
+        cancel_by = request.user.email
+        guest = booking.client.user
+
         try:
-            client_email_service = EmailService(client_email)
-            host_email_service = EmailService(host_email)
-            bongalo_email_service = EmailService('info@bongalo.co')
+            guest_email_service = EmailService(guest.email)
+            host_email_service = EmailService(host.email)
+            admin_email_service = EmailService('info@bongalo.co')
             payload = {
-                'host_last_name': booking.apartment.owner.user.last_name,
-                'client_last_name': request.user.last_name,
-                'host_first_name': booking.apartment.owner.user.first_name,
-                'client_first_name': request.user.first_name
+                'host_last_name': host.last_name,
+                'client_last_name': guest.last_name,
+                'host_first_name': host.first_name,
+                'client_first_name': guest.first_name,
+                'reference_number': booking.uuid
+
             }
-            email_host = SendEmailThread(host_email_service.cancelation_for_host, payload=payload)
-            email_host.run()
-            email_client = SendEmailThread(client_email_service.cancelation_for_client, payload=payload)
-            email_client.run()
+            if guest.email == cancel_by.email:
+                emails_to_send = [guest_email_service.cancelation_by_guest_to_guest,
+                                  host_email_service.cancelation_by_guest_to_host,
+                                  admin_email_service.cancelation_by_guest_to_admin]
+                for email in emails_to_send:
+                    email_thread = SendEmailThread(email, payload=payload)
+                    email_thread.run()
+            elif host.email == cancel_by.email:
+                emails_to_send = [guest_email_service.cancelation_by_host_to_guest,
+                                  host_email_service.cancelation_by_host_to_host,
+                                  admin_email_service.cancelation_by_host_to_admin]
+                for email in emails_to_send:
+                    email_thread = SendEmailThread(email, payload=payload)
+                    email_thread.run()
         except BaseException as e:
             print(str(e))
 

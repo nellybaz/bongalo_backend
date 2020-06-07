@@ -98,7 +98,12 @@ class ApartmentWithOwnerSerializer(serializers.Serializer):
     title = serializers.CharField()
     main_image = serializers.CharField()
     price = serializers.IntegerField()
+    address = serializers.CharField()
+    country = serializers.CharField()
+    city = serializers.CharField()
+    check_in = serializers.CharField()
+    check_out = serializers.CharField()
 
     class Meta:
         model = Apartment
-        fields = ['title', 'main_image', 'price', 'owner']
+        fields = ['title', 'main_image', 'price', 'owner', 'address', 'country', 'city', 'check_in', 'check_out']

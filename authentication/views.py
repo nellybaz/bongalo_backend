@@ -553,7 +553,6 @@ class VerifyUserView(APIView):
                              }
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
 
-        print(request.user)
         if not request.user:
             response_data = {'responseCode': 0, 'data': "user does not exits",
                              'message': "user does not exits"

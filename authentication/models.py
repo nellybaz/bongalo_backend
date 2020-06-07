@@ -25,7 +25,7 @@ class UserProfile(models.Model):
     is_admin = models.BooleanField(blank=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now_add=True)
-    verification_status =  models.CharField(max_length=1, default="U")
+    verification_status = models.CharField(max_length=1, default="U")
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name

@@ -145,7 +145,7 @@ class UserRegisterSerializer(serializers.Serializer):
 
 class VerifyUserSerializer(serializers.Serializer):
     national_id = serializers.CharField(allow_blank=True)
-    passport = serializers.CharField()
+    passport = serializers.CharField(allow_blank=True)
 
     def update(self, instance, validated_data):
         instance.national_id = validated_data['national_id']

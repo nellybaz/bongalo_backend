@@ -4,6 +4,7 @@ from authentication.models import UserProfile
 
 
 class BookingSerializer(serializers.Serializer):
+    uuid = serializers.CharField(read_only=True)
     client = serializers.CharField()
     apartment = serializers.SlugRelatedField(
         slug_field="uuid",

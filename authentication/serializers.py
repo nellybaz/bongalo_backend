@@ -44,7 +44,7 @@ class UserRegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(read_only=True)
     uuid = serializers.CharField(read_only=True)
-    is_admin = serializers.BooleanField()
+    is_admin = serializers.BooleanField(read_only=True)
     is_active = serializers.BooleanField()
 
     def validate_email(self, value):
@@ -169,4 +169,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserPaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentMethod
+        fields = '__all__'
+
+
+class UserProfileSerializerWithDetails(serializers.ModelSerializer):
+    user = UserRegisterSerializer(read_only=True)
+    class Meta:
+        model = UserProfile
         fields = '__all__'

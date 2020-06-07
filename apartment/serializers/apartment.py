@@ -1,6 +1,7 @@
 from apartment.models import Apartment, Category, Images
 from rest_framework import serializers
 from authentication.models import UserProfile
+from authentication.serializers import UserProfileSerializerWithDetails
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -53,7 +54,6 @@ class ApartmentSerializer(serializers.Serializer):
         instance.title = validated_data['title']
         instance.description = validated_data['description']
         instance.price = validated_data['price']
-
         instance.available_rooms = validated_data['available_rooms']
         instance.max_guest_number = validated_data['max_guest_number']
         instance.country = validated_data['country']
@@ -91,3 +91,11 @@ class ApartmentSerializer(serializers.Serializer):
             )
 
         return apartment
+
+
+class ApartmentWithOwnerSerializer(serializers.Serializer):
+    owner = UserProfileSerializerWithDetails()
+
+    class Meta:
+        model = Apartment
+        fields = ['title', 'main_image', 'price', 'owner']

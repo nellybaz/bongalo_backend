@@ -1,4 +1,4 @@
-from apartment.serializers import BookingSerializer
+from apartment.serializers import BookingSerializer, BookingWithApartmentSerializer
 from rest_framework.generics import RetrieveDestroyAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -131,9 +131,9 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
 
 class MyBooking(APIView):
     """
-    get bookings made by a client
+    get bookings made by a client and on his apartment
     """
-    serializer_class = BookingSerializer
+    serializer_class = BookingWithApartmentSerializer
     permission_classes = (IsAuthenticated, IsOwner)
     authentication_classes = [TokenAuthentication, ]
 
@@ -147,7 +147,7 @@ class MyBooking(APIView):
             {'responseCode': 1,
              'data': {
                  'my_booking': serialized_my_booking.data,
-                'booking_on_my_apartment': serialized_booking_on_my_apartment.data
+                 'booking_on_my_apartment': serialized_booking_on_my_apartment.data
              },
              'message': 'your booking was retrieved'},
             status=status.HTTP_200_OK)
@@ -161,7 +161,7 @@ class BookingOnMyApartment(ListAPIView):
     """
     get bookings made on a client apartment
     """
-    serializer_class = BookingSerializer
+    serializer_class = BookingWithApartmentSerializer
     permission_classes = (IsAuthenticated, IsOwner)
     authentication_classes = [TokenAuthentication, ]
 

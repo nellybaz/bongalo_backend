@@ -116,7 +116,6 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
                 'host_first_name': host.first_name,
                 'client_first_name': guest.first_name,
                 'reference_number': booking.uuid
-
             }
             if guest.email == cancel_by.email:
                 emails_to_send = [guest_email_service.cancelation_by_guest_to_guest,

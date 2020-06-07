@@ -11,7 +11,7 @@ urlpatterns = [
     path('<uuid>/cancel',
          views.RetrieveDeleteBookingDetailsAPIView.as_view(),
          name='cancel_booking'),
-    path('/',
+    path('',
          views.MyBooking.as_view(),
          name='my_booking')]
 

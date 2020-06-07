@@ -100,14 +100,24 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         user_profile = UserProfile.objects.get(user=request.user)
-        booking = Booking.objects.get(client=user_profile, uuid=self.kwargs.get('uuid'))
+        booking = Booking.objects.filter(client=user_profile, uuid=self.kwargs.get('uuid')).first()
+        if not booking:
+            return Response({'responseCode': 0,  'message': 'There is no booking matching your criteria '},
+                            status=status.HTTP_404_NOT_FOUND)
+        if not booking.is_active:
+            return Response({'responseCode': 0,  'message': 'The booking is already canceled'},
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
         booking.is_active = False
         booking.save()
         serializer = self.get_serializer_class()
         serialized_data = serializer(booking)
         host = booking.apartment.owner.user
-        cancel_by = request.user.email
+        cancel_by = request.user
         guest = booking.client.user
+        booking_amount = booking.booking_price
+        booking_cancellation_fees = booking.cancellation_fees * booking_amount
+        service_fees = booking_amount * 0.05
+        non_refundable_amount = booking_cancellation_fees + service_fees
 
         try:
             guest_email_service = EmailService(guest.email)
@@ -115,12 +125,17 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
             admin_email_service = EmailService('info@bongalo.co')
             payload = {
                 'host_last_name': host.last_name,
-                'client_last_name': guest.last_name,
+                'guest_last_name': guest.last_name,
                 'host_first_name': host.first_name,
-                'client_first_name': guest.first_name,
-                'reference_number': booking.uuid
-
+                'guest_first_name': guest.first_name,
+                'reference_number': booking.uuid,
+                'original_amount': booking_amount,
+                'cancellation_fees': booking_cancellation_fees,
+                'services_fees': service_fees,
+                'non_refundable_amount': non_refundable_amount,
+                'amount_to_be_refunded': booking_amount - non_refundable_amount
             }
+            print(payload)
             if guest.email == cancel_by.email:
                 emails_to_send = [guest_email_service.cancelation_by_guest_to_guest,
                                   host_email_service.cancelation_by_guest_to_host,

@@ -68,6 +68,10 @@ urlpatterns = [
         'update-listing',
         views.ListingView.as_view(),
         name="update_listing"),
+    path(
+        'book',
+        views.CreateBookingView.as_view(),
+        name="book_apartment") # for backward compatibility
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

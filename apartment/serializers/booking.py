@@ -1,6 +1,8 @@
 from apartment.models import Apartment, Booking
 from rest_framework import serializers
 from authentication.models import UserProfile
+from authentication.serializers import UserProfileSerializer, UserProfileSerializerWithDetails
+from apartment.serializers.apartment import ApartmentWithOwnerSerializer
 
 
 class BookingSerializer(serializers.Serializer):
@@ -58,3 +60,13 @@ class BookingSerializer(serializers.Serializer):
         )
 
         return booking
+
+
+class BookingWithApartmentSerializer(serializers.Serializer):
+    uuid = serializers.CharField(read_only=True)
+    client = UserProfileSerializerWithDetails()
+    apartment = ApartmentWithOwnerSerializer()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+    number_of_rooms = serializers.IntegerField()
+    number_of_guest = serializers.IntegerField()

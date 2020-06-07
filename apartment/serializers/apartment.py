@@ -95,6 +95,9 @@ class ApartmentSerializer(serializers.Serializer):
 
 class ApartmentWithOwnerSerializer(serializers.Serializer):
     owner = UserProfileSerializerWithDetails()
+    title = serializers.CharField()
+    main_image = serializers.CharField()
+    price = serializers.IntegerField()
 
     class Meta:
         model = Apartment

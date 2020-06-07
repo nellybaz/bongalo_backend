@@ -74,7 +74,7 @@ class PaymentGateWay(object):
 
     def create_token(self, payload):
         url = 'https://secure.3gdirectpay.com/API/v6/'
-        data = '<?xml version="1.0" encoding="utf-8"?><API3G><CompanyToken>'+payload['company_token']+'</CompanyToken><Request>createToken</Request><Transaction><customerFirstName>'+payload['first_name']+'</customerFirstName><customerLastName>'+payload['last_name']+'</customerLastName><customerPhone>'+payload['phone_number']+'</customerPhone><customerZip>'+payload['country_code']+'</customerZip><customerCity>'+payload['user_city']+'</customerCity><customerCountry>'+payload['user_country']+'</customerCountry><customerEmail>'+payload['user_email']+'</customerEmail><PaymentAmount>'+str(payload['amount'])+'</PaymentAmount><PaymentCurrency>'+payload['currency']+'</PaymentCurrency><CompanyRef>'+payload['company_ref']+'</CompanyRef><RedirectURL>'+payload['redirect_url']+'</RedirectURL><BackURL>'+payload['back_url']+'</BackURL><CompanyRefUnique>0</CompanyRefUnique><PTL>'+payload['transaction_limit']+'</PTL><PTLtype>'+payload['transaction_type']+'</PTLtype></Transaction><Services><Service><ServiceType>'+payload['service_type']+'</ServiceType><ServiceDescription>' + payload['description'] + '</ServiceDescription><ServiceDate>'+payload['service_date']+'</ServiceDate></Service></Services></API3G>'
+        data = '<?xml version="1.0" encoding="utf-8"?><API3G><CompanyToken>'+payload.get('company_token')+'</CompanyToken><Request>createToken</Request><Transaction><customerFirstName>'+payload.get('first_name')+'</customerFirstName><customerLastName>'+payload.get('last_name')+'</customerLastName><customerPhone>'+payload.get('phone_number')+'</customerPhone><customerZip>'+payload.get('country_code')+'</customerZip><customerCity>'+payload.get('user_city')+'</customerCity><customerCountry>'+payload.get('user_country')+'</customerCountry><customerEmail>'+payload.get('user_email')+'</customerEmail><PaymentAmount>'+str(payload.get('amount'))+'</PaymentAmount><PaymentCurrency>'+payload.get('currency')+'</PaymentCurrency><CompanyRef>'+payload.get('company_ref')+'</CompanyRef><RedirectURL>'+payload.get('redirect_url')+'</RedirectURL><BackURL>'+payload.get('back_url')+'</BackURL><CompanyRefUnique>0</CompanyRefUnique><PTL>'+payload.get('transaction_limit')+'</PTL><PTLtype>'+payload.get('transaction_type')+'</PTLtype></Transaction><Services><Service><ServiceType>'+payload.get('service_type')+'</ServiceType><ServiceDescription>' + payload.get('description') + '</ServiceDescription><ServiceDate>'+payload.get('service_date')+'</ServiceDate></Service></Services></API3G>'
         headers = {'Content-Type': 'application/xml'}
         res = requests.post(url, data, headers)
         return res
@@ -91,7 +91,7 @@ object and then send a success/error message to determine response on the paymen
 
 class PaymentView(APIView):
     # permission_classes = (IsAuthenticated,)
-    # authentication_classes = [TokenAuthentication]
+    # authentication_classes = .get(TokenAuthentication)
 
     def get(self, request):
         pass

@@ -32,7 +32,7 @@ class ApartmentDetailsView(APIView):
             serialized = ApartmentSerializer(
                 apartment)
             if serialized and owner_details_serialized:
-                all_bookings_for_apartment = Booking.objects.filter(apartment=apartment, is_completed=True)
+                all_bookings_for_apartment = Booking.objects.filter(apartment=apartment, is_completed=True, is_active=True)
                 unavailable_dates_for_apartment = []
                 today = datetime.now().date()
                 

@@ -218,4 +218,29 @@ class EmailService:
             raise e
 
 
+    def cancelation_for_host(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+
+        self.message.template_id = '89e7c9bc-c129-4a0d-8b98-e67033195158'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            raise e
+
+
+    def cancelation_for_client(self, payload):
+        self.message.add_substitution(Substitution("lastName", payload.get('client_last_name')))
+
+        self.message.template_id = '89e7c9bc-c129-4a0d-8b98-e67033195158'
+
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            raise e
+
 

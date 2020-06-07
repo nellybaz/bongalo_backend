@@ -106,7 +106,7 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
         serializer = self.get_serializer_class()
         serialized_data = serializer(booking)
         host = booking.apartment.owner.user
-        cancel_by = request.user.email
+        cancel_by = request.user
         guest = booking.client.user
 
         try:
@@ -115,9 +115,9 @@ class RetrieveDeleteBookingDetailsAPIView(RetrieveDestroyAPIView):
             admin_email_service = EmailService('info@bongalo.co')
             payload = {
                 'host_last_name': host.last_name,
-                'client_last_name': guest.last_name,
+                'guest_last_name': guest.last_name,
                 'host_first_name': host.first_name,
-                'client_first_name': guest.first_name,
+                'guest_first_name': guest.first_name,
                 'reference_number': booking.uuid
 
             }

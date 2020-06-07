@@ -219,8 +219,11 @@ class EmailService:
 
 
     def cancelation_by_host_to_host(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
-
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
         self.message.template_id = '0fff75c5-9f70-4959-a1e8-dc02066b8631'
 
         try:
@@ -232,7 +235,11 @@ class EmailService:
 
 
     def cancelation_by_host_to_guest(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
 
         self.message.template_id = 'b5f95ae4-e34a-473b-80b4-ee509495ef75'
 
@@ -244,7 +251,11 @@ class EmailService:
             raise e
 
     def cancelation_by_host_to_admin(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
 
         self.message.template_id = '4d48e05e-052f-4066-92e6-9862e99984a6'
 
@@ -257,7 +268,11 @@ class EmailService:
 
 
     def cancelation_by_guest_to_host(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
 
         self.message.template_id = '89e7c9bc-c129-4a0d-8b98-e67033195158'
 
@@ -270,7 +285,11 @@ class EmailService:
 
 
     def cancelation_by_guest_to_guest(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
 
         self.message.template_id = '3feb41fb-4db4-404e-bd1d-3378c7a49788'
 
@@ -282,7 +301,11 @@ class EmailService:
             raise e
 
     def cancelation_by_guest_to_admin(self, payload):
-        self.message.add_substitution(Substitution("lastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("hostLastName", payload.get('host_last_name')))
+        self.message.add_substitution(Substitution("guestLastName", payload.get('guest_last_name')))
+        self.message.add_substitution(Substitution("hostFirstName", payload.get('host_first_name')))
+        self.message.add_substitution(Substitution("guestFirstName", payload.get('guest_first_name')))
+        self.message.add_substitution(Substitution("referenceNumber", payload.get('reference_number')))
 
         self.message.template_id = 'b1c2d43a-695d-40e5-acbe-6e760ff757ac'
 

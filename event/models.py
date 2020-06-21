@@ -14,7 +14,7 @@ class Event(models.Model):
     image = models.CharField(max_length=225)
     description = models.TextField()
     location = models.CharField(max_length=225)
-    category = models.CharField(max_length=1)
+    category = models.CharField(max_length=3)
     date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='category',
-            field=models.CharField(default=datetime.datetime(2020, 6, 21, 14, 21, 1, 263982, tzinfo=utc), max_length=1),
+            field=models.CharField(max_length=1),
             preserve_default=False,
         ),
     ]

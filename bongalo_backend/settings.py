@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'apartment',
     'authentication',
     'payment',
+    'event',
     # 'booking',
     'django_filters',
     'rest_framework',

@@ -8,6 +8,10 @@ urlpatterns = [
         'posts/all',
         views.BlogPostView.as_view(),
         name="get_all_blog_post"),
+    path(
+        'posts/get',
+        views.BlogSinglePostView.as_view(),
+        name="get_single_post"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

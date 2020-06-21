@@ -37,3 +37,33 @@ class BlogPostView(APIView):
         }
 
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response)
+
+
+class BlogSinglePostView(APIView):
+    def get(self, request):
+        blog_id = self.request.query_params.get('blog')
+        if not BlogPost.objects.filter(is_active=True, uuid=blog_id).exists():
+            response = {
+                'responseCode': 0,
+                'message': 'No blog found'
+            }
+
+            return Response(status=status.HTTP_404_NOT_FOUND, data=response)
+
+        query = BlogPost.objects.get(is_active=True, uuid=blog_id)
+        serialized = PostSerializers(query)
+        if serialized:
+            response = {
+                'responseCode': 1,
+                'data': serialized.data,
+                'message': 'Blog post data fetched successfully'
+            }
+
+            return Response(status=status.HTTP_200_OK, data=response)
+
+        response = {
+            'responseCode': 0,
+            'message': 'Error occurred when fetching blog post'
+        }
+
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response)

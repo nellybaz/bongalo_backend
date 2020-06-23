@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'bongalo_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':  'defaultdb',
+        'USER': 'doadmin',
+        'PASSWORD': 'le4ymftze506ytgt', #TODO: .env variables
+        'HOST': 'bongalo-db-do-user-7329051-0.a.db.ondigitalocean.com', #TODO: .env variables
+        'PORT': '25060'
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',

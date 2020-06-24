@@ -162,7 +162,8 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:8080",
     "https://bongalo-frontend.herokuapp.com",
     "https://bongalo.co",
-    "http://homes.bongalo.co"
+    "http://homes.bongalo.co",
+    "http://157.245.39.246:8000"
 ]
 
 CORS_ORIGIN_REGEX_WHITELIST = [
@@ -170,7 +171,8 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     "http://localhost:8080",
     "https://bongalo-frontend.herokuapp.com",
     "https://bongalo.co",
-    "http://homes.bongalo.co"
+    "http://homes.bongalo.co",
+    "http://157.245.39.246:8000"
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

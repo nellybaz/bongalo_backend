@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv("SECRET_KEY", "a-fake-secret-key-to-make-github-action-work")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -163,7 +163,6 @@ CORS_ORIGIN_WHITELIST = [
     "https://bongalo-frontend.herokuapp.com",
     "https://bongalo.co",
     "http://homes.bongalo.co",
-    "http://157.245.39.246:8000"
 ]
 
 CORS_ORIGIN_REGEX_WHITELIST = [
@@ -172,7 +171,6 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     "https://bongalo-frontend.herokuapp.com",
     "https://bongalo.co",
     "http://homes.bongalo.co",
-    "http://157.245.39.246:8000"
 ]
 DATETIME_FORMAT = '%d/%m/%Y %H:%M:%S'
 

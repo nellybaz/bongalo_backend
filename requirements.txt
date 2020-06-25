@@ -46,7 +46,6 @@ PyPDF2==1.26.0
 python-dateutil==2.8.1
 python-http-client==3.2.7
 pytz==2019.3
-PyYAML==5.3.1
 rcssmin==1.0.6
 redis==3.4.1
 reportlab==3.5.28

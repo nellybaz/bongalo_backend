@@ -83,7 +83,7 @@ class Apartment(models.Model):
     price = models.IntegerField(default=0, blank=False, db_index=True)
     discount = models.FloatField(max_length=225, blank=False)
     amenities = models.TextField(default="")  # String separated by ,
-    extras = models.TextField(default="", blank=True)  # String separated by ,
+    extras = models.TextField(default="", blank=True, null=True)  # String separated by ,
     rules = models.TextField(blank=True, default="")  # String separated by ,
     is_active = models.BooleanField(default=True, blank=False)
     is_verified = models.BooleanField(

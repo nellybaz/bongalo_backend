@@ -29,7 +29,7 @@ class ApartmentSerializer(serializers.Serializer):
         slug_field="category",
         queryset=Category.objects.all())
     amenities = serializers.CharField()
-    extras = serializers.CharField()
+    extras = serializers.CharField(allow_blank=True)
     rules = serializers.CharField(allow_blank=True)
     is_active = serializers.BooleanField()
     is_verified = serializers.BooleanField()

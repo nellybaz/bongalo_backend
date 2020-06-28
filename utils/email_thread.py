@@ -138,6 +138,20 @@ class EmailService:
             print(e)
             raise e
 
+    def password_reset(self, payload):
+        self.message.add_substitution(Substitution("resetLink", payload['resetLink']))
+
+        self.message.template_id = '17aa0216-c0f1-4846-b37d-b8aaca3b4a82'
+
+        try:
+            sendgrid_client = SendGridAPIClient(self.key)
+            response = sendgrid_client.send(self.message)
+            return response
+        except Exception as e:
+            print("sendgrid error here below ====>>>>>>")
+            print(e)
+            raise e
+
     def newsletter_subscription(self, payload):
         # self.message.add_substitution(Substitution("lastName", payload['lastName']))
 

@@ -84,7 +84,7 @@ class EmailService:
         self.message.template_id = '1c0076ca-2632-4457-b292-273cd87100ba'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -99,7 +99,7 @@ class EmailService:
         self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
 
         try:
-            key = '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'
+            key = os.getenv('SENDGRID_API_KEY')
             sendgrid_client = SendGridAPIClient(key)
             response = sendgrid_client.send(self.message)
             return response
@@ -116,7 +116,7 @@ class EmailService:
         self.message.template_id = 'b3e0163a-6080-4e2c-b4b4-9d744796e6b6'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -130,7 +130,7 @@ class EmailService:
         self.message.template_id = 'd56910c1-8e37-4e6d-b6b2-bfd86ea02ddd'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -144,7 +144,7 @@ class EmailService:
         self.message.template_id = '59c157a6-a911-4954-879e-b55bd31c954d'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -167,7 +167,7 @@ class EmailService:
         self.message.template_id = '8bfc2d14-588b-4678-acd1-00f0c47a2f2e'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -213,7 +213,7 @@ class EmailService:
         self.message.template_id = '7e8da248-c9c0-4a7a-84b0-0e805c7f5fe6'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -239,7 +239,7 @@ class EmailService:
         self.perform_substitution(payload)
         self.message.template_id = '0fff75c5-9f70-4959-a1e8-dc02066b8631'
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -252,7 +252,7 @@ class EmailService:
         self.message.template_id = 'b5f95ae4-e34a-473b-80b4-ee509495ef75'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -266,7 +266,7 @@ class EmailService:
         self.message.template_id = '4d48e05e-052f-4066-92e6-9862e99984a6'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -280,7 +280,7 @@ class EmailService:
         self.message.template_id = '89e7c9bc-c129-4a0d-8b98-e67033195158'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
@@ -293,12 +293,12 @@ class EmailService:
         self.message.template_id = '3feb41fb-4db4-404e-bd1d-3378c7a49788'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
             print("5 sendgrid error here below ====>>>>>>", e)
-            print(e.body)
+            # print(e.body)
             raise e
 
     def cancellation_by_guest_to_admin(self, payload):
@@ -307,12 +307,12 @@ class EmailService:
         self.message.template_id = 'b1c2d43a-695d-40e5-acbe-6e760ff757ac'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            sendgrid_client = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
             print("6 sendgrid error here below ====>>>>>>", e)
-            print(e.body)
+            # print(e.body)
             raise e
 
 

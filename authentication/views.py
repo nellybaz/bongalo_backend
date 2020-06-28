@@ -691,7 +691,7 @@ class ResetPasswordView(APIView):
         encrypted_message = f_encrypt.encrypt(message_to_encrypt)  # Encrypt the message
 
         #  Generate the reset link to be sent
-        reset_password_link = "https://bongalo.co/reset-password-confirm/{}/{}".format(encrypted_message.decode(), user_email)
+        reset_password_link = "https://bongalo.co/user/reset-password-confirm/{}/{}".format(encrypted_message.decode(), user_email)
                               # "?token=" + encrypted_message.decode() + "&email=" + user_email
 
         # try:

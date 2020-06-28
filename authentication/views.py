@@ -685,9 +685,10 @@ class ResetPasswordView(APIView):
 
             return Response(data=response, status=status.HTTP_404_NOT_FOUND)
 
+        salt = str(datetime.now())
         user = UserProfile.objects.get(user__email=user_email, is_active=True)
         key = Fernet.generate_key()  # Generate the unique key to encrypt text with
-        message_to_encrypt = "uuid={}&email={}".format(user.uuid+str(datetime.now()), user_email).encode()
+        message_to_encrypt = "uuid={}&email={}".format(user.uuid+salt, user_email).encode()
         f_encrypt = Fernet(key)  # Initialize the encrypt object
         encrypted_message = f_encrypt.encrypt(message_to_encrypt)  # Encrypt the message
 
@@ -728,7 +729,8 @@ class ResetPasswordView(APIView):
         PasswordReset.objects.create(
             user=user,
             is_used=False,
-            reset_key=key.decode()
+            reset_key=key.decode(),
+            salt=salt
         )
         response = {
             'responseCode': 1,
@@ -773,7 +775,7 @@ class ResetPasswordView(APIView):
 
             return Response(data=response, status=status.HTTP_200_OK)
 
-        if decrypted_message.decode() == "uuid={}&email={}".format(user.uuid, user.user.email):
+        if decrypted_message.decode() == "uuid={}&email={}".format(user.uuid+password_reset_object.salt, user.user.email):
             user.user.set_password(request.data.get('password'))
             user.user.save()
 

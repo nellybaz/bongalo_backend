@@ -66,6 +66,7 @@ class PasswordReset(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     reset_key = models.CharField(max_length=225)
     is_used = models.BooleanField(default=False)
+    salt = models.CharField(max_length=225)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

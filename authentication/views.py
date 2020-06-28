@@ -21,6 +21,7 @@ from .serializers import UserRegisterSerializer, VerifyUserSerializer
 from bongalo_backend.settings import PINDO_API_TOKEN
 from cryptography.fernet import Fernet
 from utils.email_thread import SendEmailThread, EmailService
+from datetime import datetime
 
 
 def send_email(to, subject, message):
@@ -406,7 +407,7 @@ class SocialAuth(APIView):
             return Response(data=response_data, status=status.HTTP_201_CREATED)
 
         response_data = {'responseCode': 0, 'data': serialized.errors, 'message': 'error occurred'}
-        return Response(data=respvonse_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(data=response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserView(APIView):
@@ -686,7 +687,7 @@ class ResetPasswordView(APIView):
 
         user = UserProfile.objects.get(user__email=user_email, is_active=True)
         key = Fernet.generate_key()  # Generate the unique key to encrypt text with
-        message_to_encrypt = "uuid={}&email={}".format(user.uuid, user_email).encode()
+        message_to_encrypt = "uuid={}&email={}".format(user.uuid+str(datetime.now()), user_email).encode()
         f_encrypt = Fernet(key)  # Initialize the encrypt object
         encrypted_message = f_encrypt.encrypt(message_to_encrypt)  # Encrypt the message
 

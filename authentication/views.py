@@ -333,6 +333,7 @@ class UserRegisterViews(APIView):
             partial=True)
 
         try:
+            print(request.data.get("email"))
             email_service = EmailService(request.data.get("email"))
             payload = {
                 'recipient_last_name': request.data.get('last_name'),

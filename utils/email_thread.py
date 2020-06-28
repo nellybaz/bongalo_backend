@@ -99,10 +99,13 @@ class EmailService:
         self.message.template_id = 'ff97b311-eb6c-4df7-b6a6-d11e2eb59dec'
 
         try:
-            sendgrid_client = SendGridAPIClient(os.environ.get(settings.SENDGRID_API_KEY))
+            key = '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'
+            sendgrid_client = SendGridAPIClient(key)
             response = sendgrid_client.send(self.message)
             return response
         except Exception as e:
+            print("before key")
+            print(self.message)
             print("sendgrid error here below ====>>>>>>")
             print(e)
             raise e

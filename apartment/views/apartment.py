@@ -40,16 +40,16 @@ class ApartmentDetailsView(APIView):
                 if "full_place" in apartment.space:
                     for booking in all_bookings_for_apartment:
                         if (booking.date_from > today
-                           or today < booking.date_to):
+                                or today < booking.date_to):
                             unavailable_dates_for_apartment.append
                             ({"from": booking.date_from,
-                             "to": booking.date_to})
+                              "to": booking.date_to})
 
                 elif "private_room" in apartment.space:
                     booking_counts = []
                     for booking in all_bookings_for_apartment:
                         if (booking.date_from > today
-                           or today < booking.date_to):
+                                or today < booking.date_to):
                             booking_counts.append(
                                 {"from": booking.date_from,
                                  "to": booking.date_to})
@@ -211,92 +211,60 @@ class ApartmentListAPIView(ListAPIView):
 class ApartmentSearchAPIView(APIView):
 
     def get(self, request):
-        apartment_type = self.request.query_params.get("type")
+        location = self.request.query_params.get("location")
         check_in = self.request.query_params.get("checkin")
         check_out = self.request.query_params.get("checkout")
-        number_of_guest = self.request.query_params.get("guest")
+        number_of_guests = self.request.query_params.get("guest")
         result = []
 
-        # No checkout, no checkin and apartment type is all
-        if not check_out and not check_in and apartment_type == "all":
+        # Location and guests available, but no checkin, and checkout
+        if location and not check_out and not check_in:
             result = Apartment.objects.filter(
                 is_available=True,
-                max_guest_number__gte=number_of_guest,
-                is_active=True)
+                max_guest_number__gte=number_of_guests,
+                is_active=True,
+                city__icontains=location)
+
             serialized = ApartmentSerializer(result, many=True)
+
             response = {
                 'responseCode': 1,
                 'count': len(serialized.data),
                 'results': serialized.data
             }
+
             return Response(data=response, status=status.HTTP_200_OK)
 
-        # No checkout, no checkin and apartment type is not all
-        if not check_out and not check_in and apartment_type != "all":
-            result = Apartment.objects.filter(
-                space=apartment_type,
-                is_available=True,
-                max_guest_number__gte=number_of_guest,
-                is_active=True)
-            serialized = ApartmentSerializer(result, many=True)
-            response = {
-                'responseCode': 1,
-                'count': len(serialized.data),
-                'results': serialized.data
-            }
-            return Response(data=response, status=status.HTTP_200_OK)
-
-        if check_in and check_out and apartment_type == "all":
+        # Location, guests, checkin, and checkout available
+        if location and check_in and check_out:
             res = []
-            all_apartment = Apartment.objects.filter(
+
+            all_apartments = Apartment.objects.filter(
                 is_available=True,
-                max_guest_number__gte=number_of_guest,
-                is_active=True)
-            for apartment in all_apartment:
+                max_guest_number__gte=number_of_guests,
+                is_active=True,
+                city__icontains=location)
+
+            for apartment in all_apartments:
                 d_apartment = apartment
                 check_out_d = dt.datetime.strptime(
                     check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
                 check_in_d = dt.datetime.strptime(
                     check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
                 if (check_out_d.date() < d_apartment.unavailable_from
-                   or check_in_d.date(
-                   ) > d_apartment.unavailable_to):
+                    or check_in_d.date(
+                ) > d_apartment.unavailable_to):
                     res.append(d_apartment.uuid)
 
             result = Apartment.objects.filter(uuid__in=res)
             serialized = ApartmentSerializer(result, many=True)
+
             response = {
                 'responseCode': 1,
                 'count': len(serialized.data),
                 'results': serialized.data
             }
-            return Response(data=response, status=status.HTTP_200_OK)
 
-        if check_in and check_out and apartment_type != "all":
-            res = []
-            all_apartment = Apartment.objects.filter(
-                space=apartment_type,
-                is_available=True,
-                max_guest_number__gte=number_of_guest,
-                is_active=True)
-            for apartment in all_apartment:
-                d_apartment = apartment
-                check_out_d = dt.datetime.strptime(
-                    check_out + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                check_in_d = dt.datetime.strptime(
-                    check_in + ' 00:00:00', '%d/%m/%Y %H:%M:%S')
-                if (check_out_d.date() < d_apartment.unavailable_from
-                   or check_in_d.date(
-                   ) > d_apartment.unavailable_to):
-                    res.append(d_apartment.uuid)
-
-            result = Apartment.objects.filter(uuid__in=res)
-            serialized = ApartmentSerializer(result, many=True)
-            response = {
-                'responseCode': 1,
-                'count': len(serialized.data),
-                'results': serialized.data
-            }
             return Response(data=response, status=status.HTTP_200_OK)
 
         response = {

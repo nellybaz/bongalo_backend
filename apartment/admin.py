@@ -23,6 +23,7 @@ class ApartmentAdmin(admin.ModelAdmin):
         "number_of_bathrooms",
         "max_guest_number",
         "city",
+        "space",
         "address",
         "country",
         "price",

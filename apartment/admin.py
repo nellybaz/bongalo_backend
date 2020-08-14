@@ -1,5 +1,6 @@
 from django.contrib import admin
-from apartment.models import Apartment, Category, Review, Images, Amenity, Booking
+from apartment.models import (Apartment, Category, Review,
+                              Images, Amenity, Booking)
 
 
 class ImagesAdmin(admin.ModelAdmin):
@@ -21,6 +22,8 @@ class ApartmentAdmin(admin.ModelAdmin):
         "available_rooms",
         "number_of_bathrooms",
         "max_guest_number",
+        "city",
+        "space",
         "address",
         "country",
         "price",

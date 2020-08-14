@@ -47,3 +47,25 @@ class ImageView(APIView):
 
         return Response(data=response_data,
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request):
+        image = self.request.data.get("image")
+        apartment = self.request.data.get("apartment")
+        image_obj = Images.objects.filter(image=image, apartment=apartment)
+
+        if image_obj.exists():
+            result = image_obj.delete()
+
+            if result:
+                response_data = {
+                    "responseCode": 1,
+                    "message": "Image has been deleted"}
+
+                return Response(data=response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "responseCode": 0,
+                "message": "Image does not exist"}
+
+            return Response(data=response_data,
+                            status=status.HTTP_404_NOT_FOUND)

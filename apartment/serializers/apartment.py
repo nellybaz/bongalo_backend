@@ -70,6 +70,20 @@ class ApartmentSerializer(serializers.Serializer):
         instance.space = validated_data['space']
         instance.address = validated_data['address']
         instance.save()
+
+        # Update images as well
+        images = validated_data.pop("images")
+
+        if len(images) > 0:
+            for image in images:
+                data = {
+                    'image': image,
+                    'apartment': instance
+                }
+                Images.objects.create(
+                    **data
+                )
+
         return instance
 
     def create(self, validated_data):
@@ -106,4 +120,5 @@ class ApartmentWithOwnerSerializer(serializers.Serializer):
 
     class Meta:
         model = Apartment
-        fields = ['title', 'main_image', 'price', 'owner', 'address', 'country', 'city', 'check_in', 'check_out']
+        fields = ['title', 'main_image', 'price', 'owner',
+                  'address', 'country', 'city', 'check_in', 'check_out']

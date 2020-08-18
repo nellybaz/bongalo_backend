@@ -51,21 +51,33 @@ class ImageView(APIView):
     def delete(self, request):
         image = self.request.data.get("image")
         apartment = self.request.data.get("apartment")
-        image_obj = Images.objects.filter(image=image, apartment=apartment)
 
-        if image_obj.exists():
-            result = image_obj.delete()
-
-            if result:
-                response_data = {
-                    "responseCode": 1,
-                    "message": "Image has been deleted"}
-
-                return Response(data=response_data, status=status.HTTP_200_OK)
-        else:
+        if image is None or apartment is None:
             response_data = {
-                "responseCode": 0,
-                "message": "Image does not exist"}
+                    "responseCode": 0,
+                    "message": "Apartment UUID and Image URL are both required"
+                    }
 
             return Response(data=response_data,
-                            status=status.HTTP_404_NOT_FOUND)
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            image_obj = Images.objects.filter(image=image, apartment=apartment)
+
+            if image_obj.exists():
+                result = image_obj.delete()
+
+                if result:
+                    response_data = {
+                        "responseCode": 1,
+                        "message": "Image has been deleted"}
+
+                    return Response(data=response_data,
+                                    status=status.HTTP_200_OK)
+            else:
+                response_data = {
+                    "responseCode": 0,
+                    "message": "Image does not exist"}
+
+                return Response(data=response_data,
+                                status=status.HTTP_404_NOT_FOUND)

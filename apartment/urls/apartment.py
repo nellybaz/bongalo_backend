@@ -49,6 +49,10 @@ urlpatterns = [
         views.ImageView.as_view(),
         name="get_apartment_image"),
     path(
+        'images/delete',
+        views.ImageView.as_view(),
+        name="delete_apartment_image"),
+    path(
         'rate',
         views.RatingView.as_view(),
         name="rate_apartment"),
@@ -72,4 +76,5 @@ urlpatterns = [
          views.MyBooking.as_view(),
          name='my_booking')
 ]
+
 urlpatterns = format_suffix_patterns(urlpatterns)

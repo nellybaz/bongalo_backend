@@ -50,7 +50,6 @@ class ApartmentSerializer(serializers.Serializer):
         raise serializers.ValidationError("user does not exists")
 
     def update(self, instance, validated_data):
-        print("called inside serializers")
         instance.title = validated_data['title']
         instance.description = validated_data['description']
         instance.price = validated_data['price']
@@ -69,7 +68,6 @@ class ApartmentSerializer(serializers.Serializer):
         instance.max_nights = validated_data['max_nights']
         instance.space = validated_data['space']
         instance.address = validated_data['address']
-        instance.save()
 
         # Update images as well
         images = validated_data.pop("images")
@@ -83,6 +81,36 @@ class ApartmentSerializer(serializers.Serializer):
                 Images.objects.create(
                     **data
                 )
+
+        # Remove the image once it has been set as the main image
+        new_main_image = validated_data['main_image']
+        image_obj = Images.objects.filter(image=new_main_image,
+                                          apartment=instance.uuid)
+
+        # Existing image set as the main image
+        if image_obj.exists():
+            data = {'image': instance.main_image,
+                    'apartment': instance}
+
+            Images.objects.create(**data)
+            image_obj.delete()
+
+            instance.main_image = validated_data['main_image']
+
+        # Local image set as the main image
+        elif instance.main_image != new_main_image:
+            data = {'image': instance.main_image,
+                    'apartment': instance}
+
+            Images.objects.create(**data)
+
+            instance.main_image = validated_data['main_image']
+
+        # Current main image has not changed
+        else:
+            instance.main_image = validated_data['main_image']
+
+        instance.save()
 
         return instance
 

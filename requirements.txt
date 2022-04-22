@@ -64,7 +64,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
 pycrypto==2.6.1
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 python-dateutil==2.8.1
 python-dotenv==0.13.0
 python-http-client==3.2.7
